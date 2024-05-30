@@ -1,0 +1,23 @@
+.container {
+    @apply max-w-4xl mx-auto p-20;
+}
+
+.title {
+    @apply text-2xl font-bold mb-4;
+}
+
+.description {
+    @apply text-base leading-6 mb-8;
+}
+
+.image {
+    @apply w-full max-w-2xl h-auto mb-8;
+}
+
+.link {
+    @apply text-blue-500 no-underline;
+}
+
+.link:hover {
+    @apply underline;
+}

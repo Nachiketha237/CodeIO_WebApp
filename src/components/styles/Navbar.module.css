@@ -1,0 +1,28 @@
+/* Navbar styles */
+.navbar {
+    @apply h-12 bg-primary-500 p-3 flex items-center justify-between  rounded-xl shadow-md;
+}
+.navbar-logo{
+    @apply h-14 ml-4 object-cover rounded; 
+}
+.nav-wrapper{
+    @apply flex items-center  gap-8;
+
+}
+.navbar-brand {
+    @apply text-2xl font-bold text-neutral-700;
+}
+
+.nav-links {
+    @apply list-none  flex gap-8 min-w-6;
+}
+
+.nav-link {
+    @apply text-lg cursor-pointer   p-2 rounded;
+}
+.nav-link a{
+    @apply no-underline text-neutral-600;
+}
+.nav-link a:hover {
+    @apply text-neutral-1000 ;
+}
