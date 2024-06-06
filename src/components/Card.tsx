@@ -1,12 +1,32 @@
-import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import styles from './styles/Card.module.css';
+import { useAuth } from '@/context/authProvider';
+import Event from '@/pages/Events/EventInterface';
 
-const MyCard = () => {
+
+interface CardProps {
+    event: Event;
+  }
+  
+  const Card: React.FC<CardProps> = ({ event }) => {
+    const navigate = useNavigate();
+    const { isLoggedIn } = useAuth();
+    const handleClick = () => {
+      if(!isLoggedIn)
+        navigate(`/events/${event.event_id}`, { state: { event } });
+      else 
+        navigate(`/admin/events/${event.event_id}`, { state: { event } });
+    };
+  
     return (
-        <Card>
-            <CardHeader>Header</CardHeader>
-            <CardBody>Body</CardBody>
-            <CardFooter>Footer</CardFooter>
-        </Card>
+      <div className={styles.card} onClick={handleClick}>
+        <div className={styles['card-title']}>{event.event_name}</div>
+        
+        <div className={styles['card-content']}>{event.tag_line}</div>
+        <div className={styles['card-footer']}>{event.event_date}</div>
+      </div>
     );
-};
-export default MyCard;
+  };
+  
+  export default Card;

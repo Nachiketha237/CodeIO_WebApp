@@ -1,29 +1,38 @@
-import Style from "./Styles/Events.module.css";
+import React, { useEffect, useState } from 'react';
+import styles from './Styles/Events.module.css';
+import EventList from '@/components/EventList';
+import supabase from '../../config/supabaseClient'; // Import your Supabase client
+import Event from './EventInterface'; // Correct import statement
 
-const Events = (): any => {
-    // Assuming you have an array of events
-    const events = [
-        { id: 1, title: 'Event 1', date: '2022-01-01' },
-        { id: 2, title: 'Event 2', date: '2022-02-01' },
-        { id: 3, title: 'Event 3', date: '2022-03-01' },
-    ];
+const Events: React.FC = () => {
+  const [eventdata, setEventdata] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    return (
-        <>
-        <h1>Events</h1>
-        <div className={Style["events"]}>
-            
-            <ul >
-                {events.map((event) => (
-                    <li key={event.id} className={Style["event-card"]}>
-                        <h3>{event.title}</h3>
-                        <p>Date: {event.date}</p>
-                    </li>
-                ))}
-            </ul>
-        </div>
-        </>
-    );
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const { data, error } = await supabase.supabase.from('Events').select('*');
+    console.log(data)
+      if (error) {
+        console.error('Error fetching events:', error);
+      } else {
+        setEventdata(data);
+      }
+
+      setLoading(false);
+    };
+
+    fetchEvents();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className={styles.events}>
+      <EventList eventdata={eventdata} />
+    </div>
+  );
 };
 
 export default Events;

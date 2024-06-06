@@ -1,10 +1,7 @@
 /* Styles for the individual event cards */
 
 /* Add more styles as needed */
-.event-card {
-    @apply bg-secondary-700 border border-gray-300 rounded-lg w-32 h-32 p-4 mb-4 list-none shadow-lg flex;
-    /* Add more styles as needed */
-}
+
 .events{
-    @apply grid grid-cols-3 gap-40 p-20;
+    @apply p-8 m-0;
 }

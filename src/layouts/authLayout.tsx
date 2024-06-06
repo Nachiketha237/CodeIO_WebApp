@@ -7,7 +7,7 @@ import { Outlet } from "react-router-dom";
 function AuthLayout() {
     return(
         <>
-        <div className={styles.body}>
+        <div >
             <div className={styles.container}>
                 <div className={styles.imgContainer}>
                     <img className={styles.svg} src={svg} alt="Generic Image" />

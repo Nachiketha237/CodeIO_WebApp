@@ -1,0 +1,12 @@
+.base {
+    @apply flex flex-col w-max h-auto justify-center items-center p-8 ;
+}
+
+.title {
+    @apply text-4xl font-bold  mb-8;
+    /* margin-top: 1.5rem; */
+}
+
+.gridContainer {
+    @apply grid gap-x-14 gap-y-8 grid-cols-4 min-w-min justify-center  ;
+}

@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import styles from "./styles/Navbar.module.css";
 import CodeIO from "../assets/CodeIO.jpg";
 
-export default function Navbar() {
+export default function AdminNavbar() {
     return (
         <header>
             <nav className={styles["navbar"]}>
@@ -12,17 +12,12 @@ export default function Navbar() {
                     </div>
                     <ul className={styles["nav-links"]}>
                         <li className={styles["nav-link"]}>
-                            <NavLink to="/" >Home</NavLink>
+                            <NavLink to="/admin/events/new" >New Event</NavLink>
                         </li>
                         <li className={styles["nav-link"]}>
-                            <NavLink to="/events" >Events</NavLink>
+                            <NavLink to="/logout" >Logout</NavLink>
                         </li>
-                        <li className={styles["nav-link"]}>
-                            <NavLink to="/about" >About</NavLink>
-                        </li>
-                        <li className={styles["nav-link"]}>
-                            <NavLink to="/contact" >Contact</NavLink>
-                        </li>
+                       
                         {/* <li className={styles["nav-link"]}>
                             <NavLink to="/logout" >Logout</NavLink>
                         </li> */}

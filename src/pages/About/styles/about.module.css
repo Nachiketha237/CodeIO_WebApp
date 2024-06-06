@@ -1,9 +1,12 @@
 .container {
-    @apply max-w-4xl mx-auto p-20;
+    @apply max-w-4xl  mx-auto p-20;
 }
 
 .title {
-    @apply text-2xl font-bold mb-4;
+    @apply text-2xl font-bold text-gray-800;
+    display: flex;
+    justify-content: center;
+    text-shadow: 4px 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .description {
