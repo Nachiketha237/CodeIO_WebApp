@@ -2,10 +2,16 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import Event from './EventInterface';
 import styles from './Styles/Eventpage.module.css';
+import { Button } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
 const EventPage: React.FC = () => {
   const location = useLocation();
   const { event } = location.state as { event: Event };
+  const navigate = useNavigate();
+  const handleClick = () => {
+    navigate(`/events/${event.event_id}/register`, { state: {event} });
+  };
 
   return (
     <div className={styles.base}>
@@ -26,6 +32,9 @@ const EventPage: React.FC = () => {
             <span className="font-semibold">Date:</span> {event.event_date}<br />
             <span className="font-semibold">Time:</span> {event.event_time}<br />
             <span className="font-semibold">Venue:</span> {event.venue}<br />
+            <Button mt={4} size="sm" fontSize="13px" disabled onClick={handleClick}>
+                  Register
+              </Button>
           </p>
         </div>
       </div>

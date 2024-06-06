@@ -3,7 +3,6 @@ import { AuthProvider } from '@/context/authProvider';
 import Admin from '@/pages/Admin/Admin';
 import Login from '@/pages/Auth/Login';
 import About from '@/pages/About/About';
-import Contact from '@/pages/Contact/Contact';
 import Events from '@/pages/Events/Events';
 import Home from '@/pages/Home/Home';
 import AdminLayout from '@/layouts/adminLayout';
@@ -12,6 +11,7 @@ import EventPage from '@/pages/Events/EventPage';
 import EventEdit from '@/pages/Admin/Eventedit';
 import NewEvent from '@/pages/Admin/NewEvent';
 import Register from '@/pages/Events/Register';
+import Logout from '@/pages/Auth/Logout';
 
 const routes = createBrowserRouter(
     createRoutesFromElements([
@@ -20,7 +20,8 @@ const routes = createBrowserRouter(
                 <Route path="/login" element={<Login/>} />,
                 <Route path="/admin" element={<Admin/>} />,
                 <Route path="/admin/events/new" element={<NewEvent/>} />,
-                <Route path="/admin/events/:id" element={<EventEdit/>} />
+                <Route path="/admin/events/:id" element={<EventEdit/>} />,
+                <Route path="/login" element={<Logout/>} />,
             ]}
         </Route>,
         <Route path="/" element={<AuthProvider><RootLayout/></AuthProvider>} >
@@ -30,7 +31,7 @@ const routes = createBrowserRouter(
                 <Route path="/events/:id" element={<EventPage/>} />,
                 <Route path="/events/:id/register" element={<Register/>} />,
                 <Route path="/about" element={<About />} />,
-                <Route path="/contact" element={<Contact />} />
+                // <Route path="/contact" element={<Contact />} />
             ]}
         </Route>
     ])

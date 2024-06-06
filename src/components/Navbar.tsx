@@ -20,9 +20,9 @@ export default function Navbar() {
                         <li className={styles["nav-link"]}>
                             <NavLink to="/about" >About</NavLink>
                         </li>
-                        <li className={styles["nav-link"]}>
+                        {/* <li className={styles["nav-link"]}>
                             <NavLink to="/contact" >Contact</NavLink>
-                        </li>
+                        </li> */}
                         {/* <li className={styles["nav-link"]}>
                             <NavLink to="/logout" >Logout</NavLink>
                         </li> */}

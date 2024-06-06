@@ -16,7 +16,7 @@
 }
 
 .nav-links {
-    @apply list-none flex gap-8 min-w-6;
+    @apply list-none flex gap-8 min-w-6 mr-3;
 }
 
 .nav-link {
