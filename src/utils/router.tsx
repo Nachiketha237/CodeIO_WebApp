@@ -1,39 +1,37 @@
 import { createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom';
-
-// Import your components for each route
-import Home from '@/pages/Home/Home';
+import { AuthProvider } from '@/context/authProvider';
+import Admin from '@/pages/Admin/Admin';
+import Login from '@/pages/Auth/Login';
 import About from '@/pages/About/About';
 import Contact from '@/pages/Contact/Contact';
-import RootLayout from '@/layouts/rootLayout';
-import AuthLayout from '@/layouts/authLayout';
-import Login from '@/pages/Auth/Login';
-import Register from '@/pages/Auth/Register';
-import Logout from '@/pages/Auth/Logout';
 import Events from '@/pages/Events/Events';
+import Home from '@/pages/Home/Home';
+import AdminLayout from '@/layouts/adminLayout';
+import RootLayout from '@/layouts/rootLayout';
+import EventPage from '@/pages/Events/EventPage';
+import EventEdit from '@/pages/Admin/Eventedit';
 
-
-// Create your routes using createBrowserRoute
 const routes = createBrowserRouter(
     createRoutesFromElements([
-    <Route path='/' element={<AuthLayout/>} >
-    {
-        [
-            <Route path='/logout' element={<Logout/>} />,
-            <Route path='/login' element={<Login/>} />,
-            <Route path='/register' element={<Register/>} />,
-            // <Route path='/forgot-password' element={<ForgotPassword/>} />,
-            // <Route path='/reset-password' element={<ResetPassword/>} />
-        ]
-    }
-    </Route>,
-    <Route path='/' element={<RootLayout/>} >
-        {[
-            <Route index element={<Home/>} />,
-            <Route path="events" element={<Events/>} />,
-            <Route path="/about" element={<About />} />,
-            <Route path="/contact" element={<Contact />} />
-        ]}
-    </Route>
-]));
+        <Route path="/" element={<AuthProvider><AdminLayout/></AuthProvider>} >
+            {[
+                <Route path="/login" element={<Login/>} />,
+                // <Route path="/admin" element={<Admin/>} />,
+                <Route path="/admin" element={<Admin/>} />,
+                <Route path="/admin/events/new" element={<About />} />,
+                <Route path="/admin/events/:id" element={<EventEdit/>} />
+            ]}
+        </Route>,
+        <Route path="/" element={<AuthProvider><RootLayout/></AuthProvider>} >
+            {[
+                <Route index element={<Home/>} />,
+                <Route path="/events" element={<Events/>} />,
+                <Route path="/events/:id" element={<EventPage/>} />,
+                <Route path="/about" element={<About />} />,
+                <Route path="/contact" element={<Contact />} />
+            ]}
+        </Route>
+    ])
+);
 
 export default routes;

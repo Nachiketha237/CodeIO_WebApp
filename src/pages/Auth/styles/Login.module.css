@@ -1,0 +1,19 @@
+.formTitle {
+    @apply text-3xl font-light ;
+  }
+ 
+  .formContainer {
+    @apply w-1/2  flex flex-col items-center pb-4;
+  }
+  
+  .formContainer form {
+    @apply flex flex-col items-center w-full;
+  }
+  
+  .formContainer form input {
+    @apply m-4 w-4/5 h-8 rounded-md px-2 bg-primary-300;
+  }
+  
+  .formContainer form button {
+    @apply py-1 px-2 rounded  bg-tertiary-400 cursor-pointer mb-4;
+  }

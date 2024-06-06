@@ -68,7 +68,5 @@ button:focus-visible {
 } */
 :root{
   margin: 0;
-}
-body{
-  @apply bg-secondary-0;
+  @apply bg-secondary-0
 }

@@ -3,11 +3,14 @@
 }
 
 .title {
-    @apply text-2xl font-bold mb-4;
+    @apply text-2xl font-bold text-gray-800;
+    display: flex;
+    justify-content: center;
+    text-shadow: 4px 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .description {
-    @apply text-base leading-6 mb-8;
+    @apply text-base  leading-6 mb-8;
 }
 
 .image {
