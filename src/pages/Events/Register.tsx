@@ -1,7 +1,7 @@
 import { useState ,useEffect, ChangeEvent} from 'react';
 import { Box, FormHelperText, FormControl, FormLabel, Input, Heading, Center, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Image } from "@chakra-ui/react";
 import { Form } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useLocation,useNavigate } from "react-router-dom";
 import Event from "./EventInterface";
 import supabase from "@/config/supabaseClient";
 import Registrations from './RegisterInterface';
@@ -10,6 +10,7 @@ import Registrations from './RegisterInterface';
 export default function Registration() {
     const [showQRCode, setShowQRCode] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
     const { event } = location.state as { event: Event };
     const [registerCount, setRegisterCount] = useState<number>(-1);
     const [registerData, setRegisterData] = useState<Registrations>({
@@ -33,7 +34,7 @@ export default function Registration() {
 			console.error("Error updating event data:", error);
 		} else {
 			console.log("data updated successfully:", data);
-            setRegisterData(registerData);
+            navigate(`/events`);
         }
     }
 };
