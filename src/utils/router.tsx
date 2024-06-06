@@ -11,13 +11,13 @@ import RootLayout from '@/layouts/rootLayout';
 import EventPage from '@/pages/Events/EventPage';
 import EventEdit from '@/pages/Admin/Eventedit';
 import NewEvent from '@/pages/Admin/NewEvent';
+import Register from '@/pages/Events/Register';
 
 const routes = createBrowserRouter(
     createRoutesFromElements([
         <Route path="/" element={<AuthProvider><AdminLayout/></AuthProvider>} >
             {[
                 <Route path="/login" element={<Login/>} />,
-                // <Route path="/admin" element={<Admin/>} />,
                 <Route path="/admin" element={<Admin/>} />,
                 <Route path="/admin/events/new" element={<NewEvent/>} />,
                 <Route path="/admin/events/:id" element={<EventEdit/>} />
@@ -28,6 +28,7 @@ const routes = createBrowserRouter(
                 <Route index element={<Home/>} />,
                 <Route path="/events" element={<Events/>} />,
                 <Route path="/events/:id" element={<EventPage/>} />,
+                <Route path="/events/:id/register" element={<Register/>} />,
                 <Route path="/about" element={<About />} />,
                 <Route path="/contact" element={<Contact />} />
             ]}

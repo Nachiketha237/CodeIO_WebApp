@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+
 
 const Register: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -16,7 +16,6 @@ const Register: React.FC = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // Add your registration logic here
-        <Link to="/">Go to Login</Link>
     };
 
     return (
@@ -31,7 +30,7 @@ const Register: React.FC = () => {
                     <label>Password:</label>
                     <input type="password" value={password} onChange={handlePasswordChange} />
                 </div>
-                <button type="submit"><Link to="/login">Register</Link></button>
+                <button type="submit">Register</button>
             </form>
         </div>
     );
