@@ -4,6 +4,8 @@ interface Registrations {
     user_name?: string;
     usn?: string;
     email?: string;
+    department?: string;
+    year?: string;
     phone?: string;
     payment_status?: boolean;
   }

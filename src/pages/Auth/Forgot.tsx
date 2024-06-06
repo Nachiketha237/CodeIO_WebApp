@@ -1,35 +1,31 @@
 import { useState, useEffect, ChangeEvent } from 'react';
 import { Button, FormControl, FormLabel, Input, Center, Box, Heading} from '@chakra-ui/react';
-import { useLogin, UseLoginReturns } from '../../hooks/useLogin';
 import { errorToast } from '../../utils/toast';
-import { Link } from 'react-router-dom';
+import  supabase from '../../config/supabaseClient';
 
-function Login() {
+function Forgot() {
     const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const [loading, error, login]: UseLoginReturns = useLogin();
-
-    useEffect(() => {
-        if (error) {
-            errorToast((error as Error).message);
-        }
-    }, [error]);
+   
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        if (name === "email") {
+        const {  value } = e.target; 
             setEmail(value);
-        } else if (name === "password") {
-            setPassword(value);
-        }
+        
     };
     
 
     const onFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            await login({ email, password });
+           
+        let { data, error } = await supabase.supabase.auth.resetPasswordForEmail(email)
+    
+            if (error) {
+                errorToast((error as Error).message);
+            }
+
         } catch (error) {
             console.error("Login error:", error);
         }
@@ -51,10 +47,6 @@ function Login() {
                         <Input type="email" name="email" value={email} borderColor="black" onChange={handleChange} />
                     </FormControl>
 
-                    <FormControl mb="20px">
-                        <FormLabel>Password:</FormLabel>
-                        <Input type="password" name="password" value={password} borderColor="black" onChange={handleChange} />
-                    </FormControl>
 
                     <Center mt={4}>
                         <Button colorScheme="teal" type="submit" >
@@ -62,13 +54,11 @@ function Login() {
                         </Button>
                         
                     </Center>
-                    {/* <Center mt={4}>
-                        <Link to ="/forgot_password">Forgot password</Link>
-                    </Center> */}
+                    
                 </form>
             </Box>
         </Center>
     );
 }
 
-export default Login;
+export default Forgot;

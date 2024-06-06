@@ -6,6 +6,8 @@ import Event from "@/pages/Events/EventInterface";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import  supabase  from "@/config/supabaseClient";
 
+
+
 export default function EventEdit() {
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -44,6 +46,75 @@ export default function EventEdit() {
 			
 		}
 	};
+	const handleQuery = async () => {
+		const { data: r_data, error: r_error } = await supabase.supabase
+			.from('Registrations')
+			.select('usn, user_name, email, phone')
+			.eq('event_id', event.event_id)
+		if(r_error){
+			console.error("Error fetching registration data:", r_error);
+		}
+		else{
+			console.log("Registration data fetched successfully:", r_data);
+		}
+	};
+	// const fs = require('fs');
+	// const ExcelJS = require('exceljs');
+
+	// const handleQuery = async () => {
+	// 	try {
+	// 		const { data: r_data, error: r_error } = await supabase.supabase
+	// 			.from('registrations')
+	// 			.select('usn, user_name, email, phone')
+	// 			.eq('event_id', event.event_id);
+	// 			 // Assuming single record retrieval
+
+	// 		if (r_error) {
+	// 			console.error("Error fetching registration data:", r_error);
+	// 			return;
+	// 		}
+
+	// 		console.log("Registration data fetched successfully:", r_data);
+
+	// 		// Create a new workbook
+	// 		const workbook = new ExcelJS.Workbook();
+	// 		const worksheet = workbook.addWorksheet('Registrations');
+
+	// 		// Define headers for Excel file
+	// 		worksheet.columns = [
+	// 			{ header: 'USN', key: 'usn', width: 15 },
+	// 			{ header: 'User Name', key: 'user_name', width: 30 },
+	// 			{ header: 'Email', key: 'email', width: 30 },
+	// 			{ header: 'Phone', key: 'phone', width: 15 }
+	// 		];
+
+	// 		// Add data rows
+	// 		r_data.forEach(row => {
+	// 			worksheet.addRow({
+	// 				usn: row.usn,
+	// 				user_name: row.user_name,
+	// 				email: row.email,
+	// 				phone: row.phone
+	// 			});
+	// 		});
+
+	// 		// Generate Excel file in a buffer
+	// 		const buffer = await workbook.xlsx.writeBuffer();
+
+	// 		// Write buffer to a file
+	// 		const fileName = `registrations_${Date.now()}.xlsx`; // Example file name
+	// 		fs.writeFileSync(fileName, buffer);
+
+	// 		console.log(`Excel file "${fileName}" has been generated successfully.`);
+	// 	} catch (error) {
+	// 		console.log("Error processing registrations:", error);
+	// 	}
+	// };
+
+	// // Example usage
+	
+
+	
 
 	const handleSubmit = async () => {
 		setEventData(tempeventData);
@@ -101,8 +172,11 @@ export default function EventEdit() {
 						align="center"
 					>
 						<Text fontSize="18px" fontWeight={500}>
-							Edit
+							Edit 
 						</Text>
+						{/* <Button mt={4} size="sm" fontSize="13px" onClick={handleQuery}>
+							registrations
+						</Button> */}
 						<IconButton
 							size="sm"
 							color="grey"
@@ -256,8 +330,11 @@ export default function EventEdit() {
 					<Button mt={4} size="sm" fontSize="13px" onClick={handleDelete}>
 						Delete
 					</Button>
+			
 				</div>
+				
 			)}
+			
 		</Box>
 	);
 }

@@ -12,6 +12,7 @@ import EventEdit from '@/pages/Admin/Eventedit';
 import NewEvent from '@/pages/Admin/NewEvent';
 import Register from '@/pages/Events/Register';
 import Logout from '@/pages/Auth/Logout';
+import Forgot from '@/pages/Auth/Forgot';
 
 const routes = createBrowserRouter(
     createRoutesFromElements([
@@ -22,6 +23,7 @@ const routes = createBrowserRouter(
                 <Route path="/admin/events/new" element={<NewEvent/>} />,
                 <Route path="/admin/events/:id" element={<EventEdit/>} />,
                 <Route path="/login" element={<Logout/>} />,
+                <Route path="/forgot_password" element={<Forgot/>} />,
             ]}
         </Route>,
         <Route path="/" element={<AuthProvider><RootLayout/></AuthProvider>} >
