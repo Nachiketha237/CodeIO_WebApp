@@ -3,10 +3,12 @@ import { ChangeEvent, useState } from "react";
 import { Box, Flex, Button, IconButton, Input, Text } from "@chakra-ui/react";
 import { useAuth } from "@/context/authProvider";
 import Event from "@/pages/Events/EventInterface";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import  supabase  from "@/config/supabaseClient";
 
 export default function EventEdit() {
 	const location = useLocation();
+	const navigate = useNavigate();
 	const { event } = location.state as { event: Event };
 	
 	const [eventData, setEventData] = useState<Event>(event);
@@ -28,10 +30,36 @@ export default function EventEdit() {
 			setEditOpen(false);
 		}
 	};
+	const handleDelete = async () => {
+		const { data, error } = await supabase.supabase
+			.from('Events') // Replace 'events' with your table name
+			.delete()
+			.eq('event_id', event.event_id); // Assumes you have an 'event_id' field to identify the event
 
-	const handleSubmit = () => {
+		if (error) {
+			console.error("Error deleting event data:", error);
+		} else {
+			navigate('/admin');
+			console.log("Event data deleted successfully:", data);
+			
+		}
+	};
+
+	const handleSubmit = async () => {
 		setEventData(tempeventData);
 		setEditOpen(false);
+		const { data, error } = await supabase.supabase
+			.from('Events') 
+			.update(eventData)
+			.eq('event_id', event.event_id); 
+
+		if (error) {
+			console.error("Error updating event data:", error);
+		}
+		else {
+			console.log("Event data updated successfully:", data);
+			
+		}
 	};
 
 	const { isLoggedIn } = useAuth();
@@ -225,7 +253,9 @@ export default function EventEdit() {
 					<Text fontSize="14px" mb={2}>
 						Venue: {eventData.venue}
 					</Text>
-					
+					<Button mt={4} size="sm" fontSize="13px" onClick={handleDelete}>
+						Delete
+					</Button>
 				</div>
 			)}
 		</Box>
