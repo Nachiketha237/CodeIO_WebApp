@@ -43,12 +43,14 @@ function Home() {
                             To promote the exploration and development of technical skills, ensuring students can apply these skills in real-world scenarios.
                         </p>
                     </div>
+                   
                     <div className={styles.description}>
                         <h2>Our Mission</h2>
                         <p>
                             To cultivate an environment that promotes excellence in computer science education and engineering knowledge through various activities and projects.
                         </p>
                     </div>
+                    
                     <div className={styles.description}>
                         <h2>What We Do</h2>
                         <p>&lt;CodeIO/&gt; focuses on three main verticals:</p>
@@ -76,6 +78,7 @@ function Home() {
                             ))}
                         </div>
                     </div>
+                   
                     <div className={styles.description}>
                         <h2>Objectives</h2>
                         <ul>

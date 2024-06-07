@@ -35,10 +35,8 @@ export default function AdminNavbar() {
                         <NavLink to="/admin/events/new">New Event</NavLink>
                     </li>
                     {isLoggedIn && (
-                        <li className={styles["nav-link"]}>
-                            <Button  fontSize="13px" onClick={handleLogout}>
+                        <li className={styles["nav-link"]} onClick={handleLogout}>
                                 Logout
-                            </Button>
                         </li>
                     
                     )}

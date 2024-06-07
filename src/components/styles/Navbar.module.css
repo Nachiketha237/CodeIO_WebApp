@@ -1,10 +1,10 @@
 /* Navbar styles */
 .navbar {
-    @apply h-12 bg-primary-500 p-3 flex items-center justify-between rounded-xl shadow-md w-screen;
+    @apply h-12 bg-primary-500 p-4 flex items-center justify-between rounded-xl shadow-md w-screen;
 }
 
 .navbar-logo {
-    @apply h-14 ml-4 object-cover rounded ; 
+    @apply h-14 ml-4 object-cover rounded  ; 
 }
 
 .nav-wrapper {
@@ -20,7 +20,8 @@
 }
 
 .nav-link {
-    @apply text-lg cursor-pointer p-2 rounded;
+    @apply text-lg cursor-pointer p-2 rounded ;
+    
 }
 
 .nav-link a {
