@@ -1,5 +1,5 @@
 .card {
-    @apply w-56 h-56 bg-primary-400 rounded-lg shadow-2xl p-4;
+    @apply w-56 h-60 bg-primary-400 rounded-2xl shadow-2xl p-4;
 }
 
 .card-title {
@@ -17,4 +17,9 @@
 .card-button:hover {
     @apply bg-blue-700;
 }
+.image {
+    @apply flex justify-center items-center object-cover h-28 w-full mb-3;
+    aspect-ratio: 1/1; /* Corrected aspect ratio syntax */
+}
+
    

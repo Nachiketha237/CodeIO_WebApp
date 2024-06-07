@@ -1,5 +1,5 @@
 .container {
-    @apply max-w-4xl  mx-auto p-20;
+    @apply max-w-5xl  mx-auto p-20;
 }
 
 .title {
