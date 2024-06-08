@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 import styles from "./styles/Navbar.module.css";
 import CodeIO from "../assets/CodeIO.jpg";
-import { Button } from "@chakra-ui/react";
 import supabase from "@/config/supabaseClient";
 import { useAuth } from "@/context/authProvider";
 import { useNavigate } from "react-router-dom";
@@ -32,7 +31,13 @@ export default function AdminNavbar() {
                 </div>
                 <ul className={styles["nav-links"]}>
                     <li className={styles["nav-link"]}>
+                        <NavLink to="/admin">Manage Events</NavLink>
+                    </li>
+                    <li className={styles["nav-link"]}>
                         <NavLink to="/admin/events/new">New Event</NavLink>
+                    </li>
+                    <li className={styles["nav-link"]}>
+                        <NavLink to="/admin/query">Query Tool</NavLink>
                     </li>
                     {isLoggedIn && (
                         <li className={styles["nav-link"]} onClick={handleLogout}>

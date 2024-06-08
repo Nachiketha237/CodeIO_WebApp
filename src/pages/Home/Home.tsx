@@ -1,6 +1,6 @@
 import  { useState, useEffect } from 'react';
 import styles from './styles/home.module.css';
-import  Event  from '@/pages/Events/EventInterface';
+import  Event  from '@/Interfaces/EventInterface';
 import supabase from '@/config/supabaseClient';
 import Card1 from '@/components/Card1';
 

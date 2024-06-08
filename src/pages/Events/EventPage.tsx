@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import Event from './EventInterface';
+import Event from '../../Interfaces/EventInterface';
 import styles from './Styles/Eventpage.module.css';
 import { Button } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';

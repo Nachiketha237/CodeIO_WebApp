@@ -1,10 +1,12 @@
 import { EditIcon, CloseIcon } from "@chakra-ui/icons";
 import { ChangeEvent, useState } from "react";
-import { Box, Flex, Button, IconButton, Input, Text } from "@chakra-ui/react";
+import { Box, Flex, Image, Button, IconButton, Input, Text, FormControl, FormLabel, Textarea } from "@chakra-ui/react";
 import { useAuth } from "@/context/authProvider";
-import Event from "@/pages/Events/EventInterface";
+import Event from "@/Interfaces/EventInterface";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import  supabase  from "@/config/supabaseClient";
+import supabase from "@/config/supabaseClient";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 
 
@@ -12,7 +14,7 @@ export default function EventEdit() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { event } = location.state as { event: Event };
-	
+
 	const [eventData, setEventData] = useState<Event>(event);
 	const [tempeventData, setTempEventData] = useState<Event>(event);
 	const [editOpen, setEditOpen] = useState(false);
@@ -43,298 +45,335 @@ export default function EventEdit() {
 		} else {
 			navigate('/admin');
 			console.log("Event data deleted successfully:", data);
-			
+
 		}
 	};
+
+
 	const handleQuery = async () => {
-		const { data: r_data, error: r_error } = await supabase.supabase
-			.from('Registrations')
-			.select('usn, user_name, email, phone')
-			.eq('event_id', event.event_id)
-		if(r_error){
-			console.error("Error fetching registration data:", r_error);
-		}
-		else{
-			console.log("Registration data fetched successfully:", r_data);
+		try {
+			const { data: r_data, error: r_error } = await supabase.supabase
+				.from('Registrations')
+				.select('usn, user_name, email, phone')
+				.eq('event_id', event.event_id);
+
+			if (r_error) {
+				throw new Error(`Error fetching data from Supabase: ${r_error.message}`);
+			}
+
+			if (r_data !== null && r_data.length > 0) {
+				const workbook = XLSX.utils.book_new();
+				const worksheet = XLSX.utils.json_to_sheet(r_data);
+				XLSX.utils.book_append_sheet(workbook, worksheet, `${event.event_name} Registrations`);
+				const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+				const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+				saveAs(blob, 'query_result.xlsx');
+			} else {
+				console.log('No data found for event_id:', event.event_id);
+			}
+		} catch (error) {
+			console.error('Error exporting to Excel:', error);
 		}
 	};
-	// const fs = require('fs');
-	// const ExcelJS = require('exceljs');
 
-	// const handleQuery = async () => {
-	// 	try {
-	// 		const { data: r_data, error: r_error } = await supabase.supabase
-	// 			.from('registrations')
-	// 			.select('usn, user_name, email, phone')
-	// 			.eq('event_id', event.event_id);
-	// 			 // Assuming single record retrieval
 
-	// 		if (r_error) {
-	// 			console.error("Error fetching registration data:", r_error);
-	// 			return;
-	// 		}
 
-	// 		console.log("Registration data fetched successfully:", r_data);
 
-	// 		// Create a new workbook
-	// 		const workbook = new ExcelJS.Workbook();
-	// 		const worksheet = workbook.addWorksheet('Registrations');
-
-	// 		// Define headers for Excel file
-	// 		worksheet.columns = [
-	// 			{ header: 'USN', key: 'usn', width: 15 },
-	// 			{ header: 'User Name', key: 'user_name', width: 30 },
-	// 			{ header: 'Email', key: 'email', width: 30 },
-	// 			{ header: 'Phone', key: 'phone', width: 15 }
-	// 		];
-
-	// 		// Add data rows
-	// 		r_data.forEach(row => {
-	// 			worksheet.addRow({
-	// 				usn: row.usn,
-	// 				user_name: row.user_name,
-	// 				email: row.email,
-	// 				phone: row.phone
-	// 			});
-	// 		});
-
-	// 		// Generate Excel file in a buffer
-	// 		const buffer = await workbook.xlsx.writeBuffer();
-
-	// 		// Write buffer to a file
-	// 		const fileName = `registrations_${Date.now()}.xlsx`; // Example file name
-	// 		fs.writeFileSync(fileName, buffer);
-
-	// 		console.log(`Excel file "${fileName}" has been generated successfully.`);
-	// 	} catch (error) {
-	// 		console.log("Error processing registrations:", error);
-	// 	}
-	// };
-
-	// // Example usage
-	
-
-	
 
 	const handleSubmit = async () => {
 		setEventData(tempeventData);
 		setEditOpen(false);
 		const { data, error } = await supabase.supabase
-			.from('Events') 
+			.from('Events')
 			.update(eventData)
-			.eq('event_id', event.event_id); 
+			.eq('event_id', event.event_id);
 
 		if (error) {
 			console.error("Error updating event data:", error);
 		}
 		else {
 			console.log("Event data updated successfully:", data);
-			
+
 		}
 	};
 
 	const { isLoggedIn } = useAuth();
 
-    if (!isLoggedIn) {
-        return (
+	if (!isLoggedIn) {
+		return (
 			<div>
 				Please log in to access the admin page. <Link to="/login">Go to Login</Link>
 			</div>
 		);
-    }
+	}
 
 	return (
 		<Box p={4}>
-			<Flex
-				justify="flex-end"
-				mb={5}
-				pb={4}
-				align="center"
-				borderBottom="2px solid rgba(0, 0, 0, 0.1)"
-			>
-				<IconButton
-					w="auto"
-					bg="bg-tirtiary-400"
-					color="grey"
-					h="20px"
-					onClick={() => handleClick("edit")}
-					p={3}
-					icon={<EditIcon />}
-					aria-label=""
-				></IconButton>
-			</Flex>
+
 			{editOpen && (
-				<Box ml={4} mt={3} mb={10} w="full">
-					<Flex
-						justify="space-between"
-						borderRadius="10px"
-						my={3}
-						align="center"
-					>
-						<Text fontSize="18px" fontWeight={500}>
-							Edit 
+				<Box
+					ml={4}
+					mt={3}
+					mb={10}
+					w="95%" // Adjusted width to match your design
+					mx="auto" // Center align the box horizontally
+					bg="#f0f4f7"
+					p={4}
+					borderRadius="8px"
+					boxShadow="0px 0px 10px rgba(0, 0, 0, 0.1)"
+				>
+					<Flex justify="space-between" align="center" mb={4} borderBottom="2px solid rgba(0, 0, 0, 0.1)">
+						<Text fontSize="24px" fontWeight="bold">
+							Edit Event
 						</Text>
-						{/* <Button mt={4} size="sm" fontSize="13px" onClick={handleQuery}>
-							registrations
-						</Button> */}
+
 						<IconButton
 							size="sm"
-							color="grey"
-							bg="bg-tirtiary-400"
-							p={0}
+							color="gray.600"
+							bg="gray.100"
+							p={4}
 							onClick={() => handleClick("close")}
 							icon={<CloseIcon />}
-							_hover={{}}
-							_focus={{ background: "white" }}
-							aria-label=""
-						></IconButton>
+							_hover={{ bg: "gray.100", color: "gray.800" }}
+							aria-label="Close"
+						/>
 					</Flex>
-					<Box mb={3}>
-						<Flex margin={5}/>
-						<label htmlFor="event_name">Event Name</label>
-						<Input
-							id="event_name"
-							fontSize="14px"
-							value={tempeventData.event_name}
-							onChange={(e) => handleChange(e, "event_name")}
-							placeholder="Enter title"
-							border="0.5px solid grey"
-							type="text"
-							required
-							width={"40%"}
-							ml={4}
-						/>
-					</Box>
-					<Box mb={3}>
-						<label htmlFor="tag_line">Tag Line</label>
-						<Input
-							id="tag_line"
-							fontSize="14px"
-							value={tempeventData.tag_line}
-							onChange={(e) => handleChange(e, "tag_line")}
-							placeholder="Enter tagline"
-							border="0.5px solid grey"
-							type="text"
-							defaultValue=""
-							width={"50%"}
-							ml={4}
-						/>
-					</Box>
-					<Box mb={3}>
-						<label htmlFor="event_description">Event Description</label>
-						<Input
-							id="event_description"
-							value={tempeventData.event_description}
-							fontSize="14px"
-							onChange={(e) => handleChange(e, "event_description")}
-							placeholder="Enter description"
-							border="0.5px solid grey"
-							type="text"
-							
-							overflowWrap={"normal"}
-							flexWrap={"wrap"}
-							textOverflow={"ellipsis"}
-							defaultValue=""
-							width={"80%"}
-							ml={4}
-						/>
-					</Box>
-					<Box mb={3}>
-						<label htmlFor="event_poster">Event Poster</label>
-						<Input
-							id="event_poster"
-							fontSize="14px"
-							value={tempeventData.event_poster}
-							onChange={(e) => handleChange(e, "event_date")}
-							placeholder="Enter date"
-							border="0.5px solid grey"
-							type="link"
-							width={"80%"}
-							ml={4}
-							required
-						/>
-					</Box>
-					
-					<Box mb={3}>
-						<label htmlFor="event_date">Event Date</label>
-						<Input
-							id="event_date"
-							fontSize="14px"
-							value={tempeventData.event_date}
-							onChange={(e) => handleChange(e, "event_date")}
-							placeholder="Enter date"
-							border="0.5px solid grey"
-							type="date"
-							width={"40%"}
-							ml={4}
-							required
-						/>
-					</Box>
-					<Box mb={3}>
-						<label htmlFor="event_time">Event Time</label>
-						<Input
-							id="event_time"
-							fontSize="14px"
-							value={tempeventData.event_time}
-							onChange={(e) => handleChange(e, "event_time")}
-							placeholder="Enter time"
-							border="0.5px solid grey"
-							type="time"
-							width={"40%"}
-							ml={4}
-							required
-						/>
-					</Box>
-					<Box mb={3}>
-						<label htmlFor="venue">Venue</label>
-						<Input
-							id="venue"
-							fontSize="14px"
-							value={tempeventData.venue}
-							onChange={(e) => handleChange(e, "venue")}
-							placeholder="Enter venue"
-							border="0.5px solid grey"
-							type="text"
-							width={"50%"}
-							ml={4}
-							defaultValue=""
-						/>
-					</Box>
-					
-					<Button mt={4} size="sm" fontSize="13px" onClick={handleSubmit}>
-						Submit
-					</Button>
+
+					<form onSubmit={handleSubmit} style={{ width: "100%" }}>
+						<FormControl mb={3}>
+							<FormLabel htmlFor="event_name">Event Name</FormLabel>
+							<Input
+								id="event_name"
+								fontSize="14px"
+								value={tempeventData.event_name}
+								onChange={(e) => handleChange(e, "event_name")}
+								placeholder="Enter title"
+								borderColor="gray.400"
+								type="text"
+								width={"30%"} // Full width input
+								autoFocus
+								required
+							/>
+						</FormControl>
+
+						<FormControl mb={3}>
+							<FormLabel htmlFor="tag_line">Tag Line</FormLabel>
+							<Input
+								id="tag_line"
+								fontSize="14px"
+								value={tempeventData.tag_line}
+								onChange={(e) => handleChange(e, "tag_line")}
+								placeholder="Enter tagline"
+								borderColor="gray.400"
+								type="text"
+								width={"50%"} // Full width input
+							/>
+						</FormControl>
+
+						<FormControl mb={3}>
+							<FormLabel htmlFor="event_description">Event Description</FormLabel>
+							<Textarea>
+								<Input
+									id="event_description"
+									value={tempeventData.event_description}
+									fontSize="14px"
+									onChange={(e) => handleChange(e, "event_description")}
+									placeholder="Enter description"
+									borderColor="gray.400"
+									width={"100%"}
+									height={"60"}// Full width textarea
+									resize="vertical" />
+							</Textarea>
+						</FormControl>
+
+						<FormControl mb={3}>
+							<FormLabel htmlFor="event_poster">Event Poster Link</FormLabel>
+							<Input
+								id="event_poster"
+								fontSize="14px"
+								value={tempeventData.event_poster}
+								onChange={(e) => handleChange(e, "event_poster")}
+								placeholder="Enter poster link"
+								borderColor="gray.400"
+								type="url"
+								width={"100%"} // Full width input
+								required
+							/>
+						</FormControl>
+
+						<Flex justify="space-between">
+							<FormControl mb={3} mr={2} flex="1">
+								<FormLabel htmlFor="event_date">Event Date</FormLabel>
+								<Input
+									id="event_date"
+									fontSize="14px"
+									value={tempeventData.event_date}
+									onChange={(e) => handleChange(e, "event_date")}
+									placeholder="Enter date"
+									borderColor="gray.400"
+									type="date"
+									width={"60%"} // Full width input
+									required
+								/>
+							</FormControl>
+
+							<FormControl mb={3} ml={2} flex="1">
+								<FormLabel htmlFor="event_time">Event Time</FormLabel>
+								<Input
+									id="event_time"
+									fontSize="14px"
+									value={tempeventData.event_time}
+									onChange={(e) => handleChange(e, "event_time")}
+									placeholder="Enter time"
+									borderColor="gray.400"
+									type="time"
+									width={"60%"} // Full width input
+									required
+								/>
+							</FormControl>
+						</Flex>
+
+						<FormControl mb={3}>
+							<FormLabel htmlFor="venue">Venue</FormLabel>
+							<Input
+								id="venue"
+								fontSize="14px"
+								value={tempeventData.venue}
+								onChange={(e) => handleChange(e, "venue")}
+								placeholder="Enter venue"
+								borderColor="gray.400"
+								type="text"
+								width={"50%"} // Full width input
+							/>
+						</FormControl>
+						<FormControl mb={3}>
+							<FormLabel htmlFor="event_poster">QR Code Link</FormLabel>
+							<Input
+								id="QR_Code"
+								fontSize="14px"
+								value={tempeventData.QR_Code}
+								onChange={(e) => handleChange(e, "QR_Code")}
+								placeholder="QR Code link"
+								borderColor="gray.400"
+								type="url"
+								width={"100%"} // Full width input
+								required
+							/>
+						</FormControl>
+						<Button mt={4} size="sm" fontSize="13px" type="submit" colorScheme="blue">
+							Submit
+						</Button>
+					</form>
 				</Box>
+
 			)}
 			{!editOpen && (
-				<div>
+				<div
+					style={{
+						backgroundColor: "#EFF4FF",
+						padding: "20px",
+						borderRadius: "8px",
+						boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
+						width: "95%",// Optional: Adjust the width as per your layout
+						margin: "3px auto", // Optional: Center align the card
+					}}
+				>
 					
-					<Text fontSize="20px" mb={3} fontWeight={500}>
-						 {eventData.event_name}
+					<Flex
+						justify="flex-end"
+						align="center"
+						mb={5}
+						borderBottom="2px solid rgba(0, 0, 0, 0.1)"
+					>
+
+						<IconButton
+							w="auto"
+							bg="bg-tirtiary-400"
+							color="blue.500"
+							h="30px"
+							onClick={() => handleClick("edit")}
+							p={1}
+							icon={<EditIcon />}
+							aria-label=""
+						/>
+						
+					</Flex>
+					<Flex mb={5}>
+						<Image
+							src={eventData.event_poster}
+							alt={eventData.event_name}
+							width="140px"
+							height="140px"
+							objectFit="cover"
+							borderRadius="3px"
+							boxShadow="5px 5px 8px rgba(0, 0, 0, 0.4)"
+							mr={4} />
+						<Text fontSize="24px" mb={4} fontWeight="bold" color="#333">
+							{eventData.event_name}
+							<Text fontSize="18px" mb={2} fontWeight="medium" color="#666">
+								{eventData.tag_line}
+							</Text>
+							<Button
+							mt={4}
+							h="50px"
+							w="150px"
+							fontSize="13px"
+							colorScheme="blue"
+							variant="outline"
+							_hover={{ bg: "blue.500", color: "white" }}
+							onClick={handleQuery}
+						>
+							Export Registrations
+						</Button>
+						</Text>
+
+
+						{/* <Image
+				  src={eventData.QR_Code}
+				  alt={eventData.event_name}
+				  width="140px"
+				  height="140px"
+				  objectFit="cover"
+				  borderRadius="3px"
+				  boxShadow="5px 5px 8px rgba(0, 0, 0, 0.4)"
+				  
+				  mr={4}/> */}
+
+					</Flex>
+
+
+					<Text fontSize="16px" mb={3} color="#444">
+						{eventData.event_description}
 					</Text>
-					<Text fontSize="17px" mb={2}>
-						 {eventData.tag_line}
-					</Text>
-					<Text fontSize="15px" mb={2} fontWeight={500}>
-						 {eventData.event_description}
-					</Text>
-					<Text fontSize="14px" mb={2}>
+					<Text fontSize="14px" mb={2} color="#555">
 						Event Date: {eventData.event_date}
 					</Text>
-					<Text fontSize="14px" mb={2}>
+					<Text fontSize="14px" mb={2} color="#555">
 						Event Time: {eventData.event_time}
 					</Text>
-					<Text fontSize="14px" mb={2}>
+					<Text fontSize="14px" mb={2} color="#555">
 						Venue: {eventData.venue}
 					</Text>
-					<Button mt={4} size="sm" fontSize="13px" onClick={handleDelete}>
-						Delete
-					</Button>
-			
+					
+					<Flex justify="space-between" align="center">
+						
+						<Button
+							mt={4}
+							size="sm"
+							fontSize="14px"
+							colorScheme="red"
+							variant="outline"
+							_hover={{ bg: "red.500", color: "white" }}
+							onClick={handleDelete}
+						>
+							Delete Event
+						</Button>
+					</Flex>
+							
 				</div>
-				
+
 			)}
-			
+
 		</Box>
 	);
 }

@@ -19,9 +19,9 @@ import {
     ModalCloseButton,
 } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Event from "./EventInterface";
+import Event from "../../Interfaces/EventInterface";
 import supabase from "@/config/supabaseClient";
-import Registrations from './RegisterInterface';
+import Registrations from '../../Interfaces/RegisterInterface';
 import { errorToast } from '@/utils/toast';
 
 export default function Registration() {

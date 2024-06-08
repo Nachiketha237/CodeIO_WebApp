@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './styles/Card.module.css';
 import { useAuth } from '@/context/authProvider';
-import Event from '@/pages/Events/EventInterface';
+import Event from '@/Interfaces/EventInterface';
 
 
 interface CardProps {

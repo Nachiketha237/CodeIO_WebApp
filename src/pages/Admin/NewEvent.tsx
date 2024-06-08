@@ -1,198 +1,216 @@
+import React, { useState } from 'react';
+import {
+  Box,
+  FormControl,
+  FormLabel,
+  Input,
+  Text,
+  Textarea,
+  Button,
+  Flex,
+  Link as ChakraLink,
+} from '@chakra-ui/react';
+import { useAuth } from '../../context/authProvider';
+import { Link } from 'react-router-dom';
+import supabase from '../../config/supabaseClient';
+import Event from '../../Interfaces/EventInterface';
 
-import { ChangeEvent, useState } from "react";
-import { Box, Flex, Button, Input } from "@chakra-ui/react";
-import { useAuth } from "@/context/authProvider";
-import Event from "@/pages/Events/EventInterface";
-import { Link, useNavigate  } from "react-router-dom";
-import supabase from "@/config/supabaseClient";
-import { useEffect } from "react";
+const NewEvent: React.FC = () => {
+  const [newEvent, setNewEvent] = useState<Event>({
+    event_id: 0,
+    event_name: '',
+    event_date: '',
+    venue: '',
+    event_description: '',
+    QR_Code: '', // Added QR_Code field to match your form
+  });
 
-export default function NewEvent() {
-	const navigate = useNavigate();
-    const { isLoggedIn } = useAuth();
-    const [eventCount, setEventCount] = useState<number>(-1);
-	const [eventData, setEventData] = useState<Event>({
-		event_name: "",
-		tag_line: "",
-		event_description: "",
-		event_poster: "",
-		event_date: "",
-		event_time: "",
-		venue: ""
-	});
-	
-    useEffect(() => {
-        fetchEventCount();
-      }, []);
-    
-      const fetchEventCount = async () => {
-        const { count, error } = await supabase.supabase
-          .from('Events')
-          .select('*', { count: 'exact' });
-    
-        if (error) {
-          console.error("Error fetching event count:", error);
-        } else if (count !== null && count>=0) {
-          setEventCount(count);
-            setEventData((prevEventData) => ({
-                ...prevEventData,
-                event_id: count + 1
-            }));
-        }
-      };
+  const { isLoggedIn } = useAuth();
 
-	const handleChange = (e: ChangeEvent<HTMLInputElement>, inputContent: string) => {
-		const { value } = e.target;
-		setEventData((prevEventData) => ({
-			...prevEventData,
-			[inputContent]: value,
-		}));
-	};
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setNewEvent(prev => ({ ...prev, [name]: value }));
+  };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const { data, error } = await supabase.supabase.from('Events').insert([newEvent]);
+      if (error) {
+        console.error('Error adding event:', error.message);
+      } else if (data) {
+        console.log('Event added successfully:', data);
+        setNewEvent({
+          event_id: 0,
+          event_name: '',
+          event_date: '',
+          venue: '',
+          event_description: '',
+          QR_Code: '',
+        });
+      }
+    } catch (error) {
+      console.error('Error adding event:', error);
+    }
+  };
 
-	const handleSubmit = async () => {
-		const { data, error } = await supabase.supabase
-			.from('Events')
-			.insert([eventData]);
+  if (!isLoggedIn) {
+    return (
+      <Box>
+        Please log in to access the admin page. <ChakraLink as={Link} to="/login">Go to Login</ChakraLink>
+      </Box>
+    );
+  }
 
-		if (error) {
-			console.error("Error updating event data:", error);
-		} else {
-			console.log("Event data updated successfully:", data);
-			setEventData(eventData);
-			navigate('/admin');
-		}
-	};
+  return (
+    <Box
+      mx="auto"
+      w="95%"
+      bg="#EFF4FF"
+      p={4}
+      mt={10}
+      borderRadius="8px"
+      boxShadow="0px 0px 10px rgba(0, 0, 0, 0.1)"
+    >
+      <Text fontSize="24px" fontWeight="bold">
+					New Event
+				</Text>
+      <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+        <FormControl mb={3}>
+          <FormLabel htmlFor="event_name">Event Name</FormLabel>
+          <Input
+            id="event_name"
+            fontSize="14px"
+            name="event_name"
+            value={newEvent.event_name}
+            onChange={handleInputChange}
+            placeholder="Enter title"
+            borderColor="gray.400"
+            type="text"
+            width={"100%"} // Full width input
+            autoFocus
+            required
+          />
+        </FormControl>
 
-	
+        <FormControl mb={3}>
+          <FormLabel htmlFor="tag_line">Tag Line</FormLabel>
+          <Input
+            id="tag_line"
+            fontSize="14px"
+            name="tag_line"
+            value={newEvent.tag_line}
+            onChange={handleInputChange}
+            placeholder="Enter tagline"
+            borderColor="gray.400"
+            type="text"
+            width={"100%"} // Full width input
+          />
+        </FormControl>
 
-	if (!isLoggedIn) {
-		return (
-			<div>
-				Please log in to access the admin page. <Link to="/login">Go to Login</Link>
-			</div>
-		);
-	}
+        <FormControl mb={3}>
+          <FormLabel htmlFor="event_description">Event Description</FormLabel>
+          <Textarea
+            id="event_description"
+            value={newEvent.event_description}
+            fontSize="14px"
+            name="event_description"
+            onChange={handleInputChange}
+            placeholder="Enter description"
+            borderColor="gray.400"
+            width={"100%"}
+            resize="vertical"
+            required
+          />
+        </FormControl>
 
-	return (
-		<Box p={4}>
-					<Box mb={3}>
-						<Flex margin={5}/>
-						<label htmlFor="event_name">Event Name</label>
-						<Input
-							id="event_name"
-							fontSize="14px"
-							value={eventData.event_name}
-							onChange={(e) => handleChange(e, "event_name")}
-							placeholder="Enter title"
-							border="0.5px solid grey"
-							type="text"
-							required
-							width={"40%"}
-							ml={4}
-						/>
-					</Box>
-					<Box mb={3}>
-						<label htmlFor="tag_line">Tag Line</label>
-						<Input
-							id="tag_line"
-							fontSize="14px"
-							value={eventData.tag_line}
-							onChange={(e) => handleChange(e, "tag_line")}
-							placeholder="Enter tagline"
-							border="0.5px solid grey"
-							type="text"
-							defaultValue=""
-							width={"50%"}
-							ml={4}
-						/>
-					</Box>
-					<Box mb={3}>
-						<label htmlFor="event_description">Event Description</label>
-						<Input
-							id="event_description"
-							value={eventData.event_description}
-							fontSize="14px"
-							onChange={(e) => handleChange(e, "event_description")}
-							placeholder="Enter description"
-							border="0.5px solid grey"
-							type="text"
-							
-							overflowWrap={"normal"}
-							flexWrap={"wrap"}
-							textOverflow={"ellipsis"}
-							defaultValue=""
-							width={"80%"}
-							ml={4}
-						/>
-					</Box>
-					<Box mb={3}>
-						<label htmlFor="event_poster">Event Poster</label>
-						<Input
-							id="event_poster"
-							fontSize="14px"
-							value={eventData.event_poster}
-							onChange={(e) => handleChange(e, "event_poster")}
-							placeholder="Enter poster link"
-							border="0.5px solid grey"
-							type="text"
-							width={"80%"}
-							ml={4}
-							required
-						/>
-					</Box>
-					
-					<Box mb={3}>
-						<label htmlFor="event_date">Event Date</label>
-						<Input
-							id="event_date"
-							fontSize="14px"
-							value={eventData.event_date}
-							onChange={(e) => handleChange(e, "event_date")}
-							placeholder="Enter date"
-							border="0.5px solid grey"
-							type="date"
-							width={"40%"}
-							ml={4}
-							required
-						/>
-					</Box>
-					<Box mb={3}>
-						<label htmlFor="event_time">Event Time</label>
-						<Input
-							id="event_time"
-							fontSize="14px"
-							value={eventData.event_time}
-							onChange={(e) => handleChange(e, "event_time")}
-							placeholder="Enter time"
-							border="0.5px solid grey"
-							type="time"
-							width={"40%"}
-							ml={4}
-							required
-						/>
-					</Box>
-					<Box mb={3}>
-						<label htmlFor="venue">Venue</label>
-						<Input
-							id="venue"
-							fontSize="14px"
-							value={eventData.venue}
-							onChange={(e) => handleChange(e, "venue")}
-							placeholder="Enter venue"
-							border="0.5px solid grey"
-							type="text"
-							width={"50%"}
-							ml={4}
-							defaultValue=""
-						/>
-					</Box>
-					
-					<Button mt={4} size="sm" fontSize="13px" onClick={handleSubmit}>
-						Submit
-					</Button>
-				</Box>
+        <FormControl mb={3}>
+          <FormLabel htmlFor="event_poster">Event Poster Link</FormLabel>
+          <Input
+            id="event_poster"
+            fontSize="14px"
+            name="event_poster"
+            value={newEvent.event_poster}
+            onChange={handleInputChange}
+            placeholder="Enter poster link"
+            borderColor="gray.400"
+            type="url"
+            width={"100%"} // Full width input
+            required
+          />
+        </FormControl>
 
-		
-	);
-}
+        <Flex justify="space-between">
+          <FormControl mb={3} mr={2} flex="1">
+            <FormLabel htmlFor="event_date">Event Date</FormLabel>
+            <Input
+              id="event_date"
+              fontSize="14px"
+              name="event_date"
+              value={newEvent.event_date}
+              onChange={handleInputChange}
+              placeholder="Enter date"
+              borderColor="gray.400"
+              type="date"
+              width={"100%"} // Full width input
+              required
+            />
+          </FormControl>
+
+          <FormControl mb={3} ml={2} flex="1">
+            <FormLabel htmlFor="event_time">Event Time</FormLabel>
+            <Input
+              id="event_time"
+              fontSize="14px"
+              name="event_time"
+              value={newEvent.event_time}
+              onChange={handleInputChange}
+              placeholder="Enter time"
+              borderColor="gray.400"
+              type="time"
+              width={"100%"} // Full width input
+              required
+            />
+          </FormControl>
+        </Flex>
+
+        <FormControl mb={3}>
+          <FormLabel htmlFor="venue">Venue</FormLabel>
+          <Input
+            id="venue"
+            fontSize="14px"
+            name="venue"
+            value={newEvent.venue}
+            onChange={handleInputChange}
+            placeholder="Enter venue"
+            borderColor="gray.400"
+            type="text"
+            width={"100%"} // Full width input
+          />
+        </FormControl>
+
+        <FormControl mb={3}>
+          <FormLabel htmlFor="QR_Code">QR Code Link</FormLabel>
+          <Input
+            id="QR_Code"
+            fontSize="14px"
+            name="QR_Code"
+            value={newEvent.QR_Code}
+            onChange={handleInputChange}
+            placeholder="QR Code link"
+            borderColor="gray.400"
+            type="url"
+            width={"100%"} // Full width input
+            required
+          />
+        </FormControl>
+
+        <Button mt={4} size="sm" fontSize="13px" type="submit" colorScheme="blue">
+          Submit
+        </Button>
+      </form>
+    </Box>
+  );
+};
+
+export default NewEvent;

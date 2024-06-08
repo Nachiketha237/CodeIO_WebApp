@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './styles/Card1.module.css';
-import  Event  from '@/pages/Events/EventInterface';
+import  Event  from '@/Interfaces/EventInterface';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/authProvider';

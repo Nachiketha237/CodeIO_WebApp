@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './Styles/Events.module.css';
 import EventList from '@/components/EventList';
 import supabase from '../../config/supabaseClient'; // Import your Supabase client
-import Event from './EventInterface'; // Correct import statement
+import Event from '../../Interfaces/EventInterface'; // Correct import statement
 
 const Events: React.FC = () => {
   const [eventdata, setEventdata] = useState<Event[]>([]);
