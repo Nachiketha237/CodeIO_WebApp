@@ -14,16 +14,22 @@ import { useAuth } from '../../context/authProvider';
 import { Link } from 'react-router-dom';
 import supabase from '../../config/supabaseClient';
 import Event from '../../Interfaces/EventInterface';
+import { useEffect } from 'react';
 
 const NewEvent: React.FC = () => {
   const [newEvent, setNewEvent] = useState<Event>({
-    event_id: 0,
+    event_id: -1,
     event_name: '',
+    event_poster: '',
+    event_price: '',
+    tag_line: '',
     event_date: '',
+    event_time: '',
     venue: '',
     event_description: '',
     QR_Code: '', // Added QR_Code field to match your form
   });
+  const [eventCount, setEventCount] = useState<number>(-1);
 
   const { isLoggedIn } = useAuth();
 
@@ -32,22 +38,48 @@ const NewEvent: React.FC = () => {
     setNewEvent(prev => ({ ...prev, [name]: value }));
   };
 
+  useEffect(() => {
+    fetchEventCount();
+  }, []);
+
+  const fetchEventCount = async () => {
+    const { count, error } = await supabase.supabase
+      .from('Events')
+      .select('*', { count: 'exact' });
+
+    if (error) {
+      console.error("Error fetching event count:", error);
+    } else if (count !== null && count>=0) {
+      setEventCount(count);
+        setNewEvent((prevEventData) => ({
+            ...prevEventData,
+            event_id: count + 1
+        }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      if(newEvent.event_id !== -1 && newEvent.event_name !== '' && newEvent.event_poster !== '' && newEvent.event_description !== '' && newEvent.event_date !== '' && newEvent.event_time !== '' && newEvent.QR_Code !== '') {
       const { data, error } = await supabase.supabase.from('Events').insert([newEvent]);
       if (error) {
         console.error('Error adding event:', error.message);
       } else if (data) {
         console.log('Event added successfully:', data);
         setNewEvent({
-          event_id: 0,
+          event_id: -1,
           event_name: '',
+          event_poster: '',
+          event_price: '',
+          tag_line: '',
           event_date: '',
+          event_time: '',
           venue: '',
           event_description: '',
           QR_Code: '',
         });
+      }
       }
     } catch (error) {
       console.error('Error adding event:', error);
