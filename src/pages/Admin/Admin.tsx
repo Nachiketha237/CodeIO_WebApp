@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Heading, Tabs, TabList, Tab, TabPanels, TabPanel, Button, Textarea, Flex, TabIndicator } from '@chakra-ui/react';
+import { Box, Heading } from '@chakra-ui/react';
 import { useAuth } from '../../context/authProvider';
 import { Link, Outlet } from 'react-router-dom';
 import ManageEvents from './ManageEvents';

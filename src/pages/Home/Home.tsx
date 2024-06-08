@@ -3,6 +3,7 @@ import styles from './styles/home.module.css';
 import  Event  from '@/Interfaces/EventInterface';
 import supabase from '@/config/supabaseClient';
 import Card1 from '@/components/Card1';
+import Loading from '../Loading';
 
 function Home() {
     const [eventdata, setEventdata] = useState<Event[]>([]);
@@ -23,7 +24,7 @@ function Home() {
     }, []);
 
     if (loading) {
-        return <div>Loading...</div>;
+        <Loading isLoading={loading} />;
     }
 
     // Limit the number of cards to display to a maximum of 3
