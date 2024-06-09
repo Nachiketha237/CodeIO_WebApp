@@ -11,24 +11,31 @@ import primary from '../../utils/themes';
 import supabase from '../../config/supabaseClient';
 import { useEffect, useState } from 'react';
 import Event from '../../Interfaces/EventInterface';
+import Loading from '../Loading';
 
 const PastEvents: React.FC = () => {
   const [eventdata, setEventdata] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEvents = async () => {
-      const { data, error } = await supabase.supabase.from('Events').select('*').filter('event_type', 'eq', 'Past').order('event_start_date', { ascending: true });
+      const { data, error } = await supabase.supabase.from('Events').select('*').filter('event_type', 'eq', 'Past').order('event_start_date', { ascending: false });
       console.log(data)
       if (error) {
         console.error('Error fetching events:', error);
       } else {
+
         setEventdata(data);
       }
+      setLoading(false);
     };
-
+    
     fetchEvents();
   }, []);
-
+  if(loading)
+    {
+      return <Loading isLoading/>
+    }
   return (
     <Box py={12} bg={primary['0']}>
       <Container maxW="container.lg">

@@ -8,5 +8,5 @@
 }
 
 .gridContainer {
-    @apply grid gap-x-14 gap-y-8 grid-cols-4 min-w-min justify-center  ;
+    @apply grid gap-x-12 gap-y-8 grid-cols-4 min-w-min justify-center  ;
 }

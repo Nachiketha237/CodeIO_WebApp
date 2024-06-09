@@ -3,6 +3,7 @@ import styles from './Styles/Events.module.css';
 import EventList from '@/components/EventList';
 import supabase from '../../config/supabaseClient'; // Import your Supabase client
 import Event from '../../Interfaces/EventInterface'; // Correct import statement
+import Loading from '../Loading';
 
 const Events: React.FC = () => {
   const [eventdata, setEventdata] = useState<Event[]>([]);
@@ -25,7 +26,7 @@ const Events: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading isLoading/>
   }
 
   return (

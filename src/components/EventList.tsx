@@ -1,5 +1,5 @@
 import React from 'react';
-import Card from '@/components/Card'; 
+import EventCard from '@/components/EventCard'; 
 import styles from './styles/Eventlist.module.css'; 
 import Event from '@/Interfaces/EventInterface'; 
 
@@ -13,7 +13,7 @@ const EventList: React.FC<EventListProps> = ({ eventdata }) => {
       <p className={styles.title}>Events</p>
       <div className={styles.gridContainer}>
         {eventdata.map(event => (
-          <Card key={event.event_id} event={event} />
+          <EventCard key={event.event_id} event={event} />
         ))}
       </div>
     </div>

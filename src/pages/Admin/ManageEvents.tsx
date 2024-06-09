@@ -4,7 +4,7 @@ import Event from '../../Interfaces/EventInterface';
 import supabase from '../../config/supabaseClient';
 import { useAuth } from '../../context/authProvider';
 import { Link } from 'react-router-dom';
-import Card from '../../components/Card';
+import Card from '../../components/EventCard';
 
 const ManageEvents: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);

@@ -275,7 +275,7 @@ export default function EventEdit() {
 								required
 							/>
 						</FormControl>
-						<Button mt={4} size="sm" fontSize="13px" type="submit" colorScheme="blue">
+						<Button mt={4} size="sm" fontSize="13px" type="submit" colorScheme="blue" onClick={handleSubmit}>
 							Submit
 						</Button>
 					</form>

@@ -1,6 +1,6 @@
 /* Navbar styles */
 .navbar {
-    @apply h-12 bg-primary-500 p-4 flex items-center justify-between rounded-xl shadow-md w-screen;
+    @apply h-16 bg-primary-500 p-4 flex items-center justify-between rounded-xl shadow-md w-screen;
 }
 
 .navbar-logo {
@@ -12,7 +12,7 @@
 }
 
 .navbar-brand {
-    @apply text-2xl font-bold text-neutral-700;
+    @apply text-3xl font-bold text-neutral-700;
 }
 
 .nav-links {
@@ -20,7 +20,7 @@
 }
 
 .nav-link {
-    @apply text-lg cursor-pointer p-2 rounded ;
+    @apply text-xl cursor-pointer p-2 rounded ;
     
 }
 
