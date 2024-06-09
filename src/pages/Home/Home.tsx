@@ -4,6 +4,7 @@ import Event from '@/Interfaces/EventInterface';
 import supabase from '@/config/supabaseClient';
 import Card1 from '@/components/Card1';
 import Loading from '../Loading';
+import primary from '@/utils/themes';
 
 const Home: React.FC = () => {
   const [eventdata, setEventdata] = useState<Event[]>([]);
@@ -32,13 +33,13 @@ const Home: React.FC = () => {
 //   const displayedEvents = [...eventdata.slice(0, 4), ...eventdata.slice(0, 4), ...eventdata.slice(0, 4), ...eventdata.slice(0, 4)];
 
   return (
-    <Box p={8} minHeight="100vh" backgroundColor="primary.50" display="flex" flexDirection="column" alignItems="center">
-      <Box maxWidth="900px" width="100%">
+    <Box p={8} minHeight="100vh" backgroundColor={primary['500']} display="flex" flexDirection="column" alignItems="center">
+      <Box maxWidth="1000px" width="100%">
         <Box textAlign="center" mt={10}>
           <Heading as="h1" fontSize="4xl" mb={4}>
             Welcome to &lt;CodeIO/&gt;!
           </Heading>
-          <Text fontSize="xl" color="neutral.700">
+          <Text fontSize="xl" >
             The premier technical community and club of the Computer Science and Engineering department at B.M.S. College.
           </Text>
         </Box>
@@ -66,7 +67,7 @@ const Home: React.FC = () => {
             <Heading as="h2" fontSize="2xl" mb={4}>
               What We Do
             </Heading>
-            <Text fontSize="lg">
+            <Text fontSize="lg" mb={3}>
               &lt;CodeIO/&gt; focuses on three main verticals:
             </Text>
             <Box ml={4}>
