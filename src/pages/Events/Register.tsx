@@ -22,7 +22,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Event from "../../Interfaces/EventInterface";
 import supabase from "@/config/supabaseClient";
 import Registrations from '../../Interfaces/RegisterInterface';
-import { errorToast } from '@/utils/toast';
+import { errorToast,successToast } from '@/utils/toast';
 
 export default function Registration() {
     const [showQRCode, setShowQRCode] = useState(false);
@@ -49,33 +49,62 @@ export default function Registration() {
         }));
     };
 
-    const handlePayClick = async () => {
+    const handlePayClick =  () => {
         
         // Perform other payment-related operations here if needed
         if(registerData.payment_status === true && registerData.user_name !== "" && registerData.email !== "" && registerData.phone !== "" && registerData.department !== "" && registerData.year !== "" && registerData.usn !== "" ) {
             setShowQRCode(true);
-            const { data, error } = await supabase.supabase
-            .from('Registrations')
-            .insert([registerData]);
-
-        if (error) {
-            console.error("Error updating event data:", error);
-        } else {
-            console.log("Event data updated successfully:", data);
-            setRegisterData(registerData);
-        }
     }
         else{
             errorToast("Please fill all the details");
         }
     
     };
+    const validate = async () => {
+        const { data, error } = await supabase.supabase
+            .from('Registrations')
+            .select('usn')
+            .filter('usn','eq',registerData.usn)
+            .filter('event_id', 'eq', registerData.event_id);
+    
+        if (error) {
+            console.error('Error fetching registration data:', error);
+            return false;
+        }
+    
 
-    const handleCloseQRCode = () => {
-        setShowQRCode(false);
-        navigate('/events');
-        // Optionally reset form or update state after closing modal
+        if (data && data.length > 0) {
+            // Registration already exists for this event
+            return true;
+        } else {
+            // No registration found for this event
+            return false;
+        }
     };
+    
+    const handleCloseQRCode = async () => {
+        if (!(await validate())) {
+            const { data, error } = await supabase.supabase
+                .from('Registrations')
+                .insert([registerData]);
+    
+            if (error) {
+                console.error('Error inserting registration data:', error);
+                errorToast("Registration Failed try again");
+            } else {
+                console.log('Registration data inserted successfully:', data);
+                // Update state or perform any necessary action
+                successToast("Registration successfull")
+                navigate('/events');
+            }
+        } else {
+            errorToast("Registration already exists for this event.");
+        }
+    
+        setShowQRCode(false);
+       
+    };
+    
 
     useEffect(() => {
         fetchEventCount();
@@ -161,7 +190,7 @@ export default function Registration() {
                         <ModalCloseButton />
                         <ModalBody>
                             <Center>
-                                <img src={event.QR_Code} alt="QR Code" width="30px" height="30px" />
+                                <img src={event.QR_Code} alt="QR Code" width="150px" height="150px" />
                             </Center>
                             <FormHelperText textAlign="center" mt={2}>
                                 Scan the QR code to complete the payment.
