@@ -9,9 +9,10 @@ const Home: React.FC = () => {
   const [eventdata, setEventdata] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const events =eventdata.slice(0, 4);
   useEffect(() => {
     const fetchEvents = async () => {
-      const { data, error } = await supabase.supabase.from('Events').select('*');
+      const { data, error } = await supabase.supabase.from('Events').select('*').filter('event_type', 'eq', 'Upcoming').order('event_start_date', { ascending: true });
       if (error) {
         console.error('Error fetching events:', error);
       } else {
@@ -98,7 +99,7 @@ const Home: React.FC = () => {
               Featured Events
             </Heading>
             <Box className="gridContainer" display="grid" gridTemplateColumns="repeat(4, 1fr)" gap={6}>
-              {eventdata.map(event => (
+              {events.map(event => (
                 <Card1 key={event.event_id} event={event} />
               ))}
             </Box>

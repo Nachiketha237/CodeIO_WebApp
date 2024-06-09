@@ -203,12 +203,12 @@ export default function EventEdit() {
 
 						<Flex justify="space-between">
 							<FormControl mb={3} mr={2} flex="1">
-								<FormLabel htmlFor="event_date">Event Date</FormLabel>
+								<FormLabel htmlFor="event_date">Event Start Date</FormLabel>
 								<Input
-									id="event_date"
+									id="event_start_date"
 									fontSize="14px"
-									value={tempeventData.event_date}
-									onChange={(e) => handleChange(e, "event_date")}
+									value={tempeventData.event_start_date}
+									onChange={(e) => handleChange(e, "event__start_date")}
 									placeholder="Enter date"
 									borderColor="gray.400"
 									type="date"
@@ -216,6 +216,21 @@ export default function EventEdit() {
 									required
 								/>
 							</FormControl>
+							<FormControl mb={3} mr={2} flex="1">
+								<FormLabel htmlFor="event_end_date">Event End Date</FormLabel>
+								<Input
+									id="event_end_date"
+									fontSize="14px"
+									value={tempeventData.event_end_date}
+									onChange={(e) => handleChange(e, "event_end_date")}
+									placeholder="Enter date"
+									borderColor="gray.400"
+									type="date"
+									width={"60%"} // Full width input
+									required
+								/>
+							</FormControl>
+
 
 							<FormControl mb={3} ml={2} flex="1">
 								<FormLabel htmlFor="event_time">Event Time</FormLabel>
@@ -346,8 +361,9 @@ export default function EventEdit() {
 						{eventData.event_description}
 					</Text>
 					<Text fontSize="14px" mb={2} color="#555">
-						Event Date: {eventData.event_date}
+					Event Date: {eventData.event_start_date} {eventData.event_end_date !== '' && `to ${eventData.event_end_date}`}
 					</Text>
+
 					<Text fontSize="14px" mb={2} color="#555">
 						Event Time: {eventData.event_time}
 					</Text>

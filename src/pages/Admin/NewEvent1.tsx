@@ -16,7 +16,7 @@ export default function NewEvent() {
 		tag_line: "",
 		event_description: "",
 		event_poster: "",
-		event_date: "",
+		event_start_date: "",
 		event_time: "",
 		venue: ""
 	});
@@ -143,11 +143,26 @@ export default function NewEvent() {
 					</Box>
 					
 					<Box mb={3}>
+						<label htmlFor="event_start_date">Event Date</label>
+						<Input
+							id="event_start_date"
+							fontSize="14px"
+							value={eventData.event_start_date}
+							onChange={(e) => handleChange(e, "event_start_date")}
+							placeholder="Enter date"
+							border="0.5px solid grey"
+							type="date"
+							width={"40%"}
+							ml={4}
+							required
+						/>
+					</Box>
+					<Box mb={3}>
 						<label htmlFor="event_date">Event Date</label>
 						<Input
-							id="event_date"
+							id="event_start_date"
 							fontSize="14px"
-							value={eventData.event_date}
+							value={eventData.event_end_date}
 							onChange={(e) => handleChange(e, "event_date")}
 							placeholder="Enter date"
 							border="0.5px solid grey"

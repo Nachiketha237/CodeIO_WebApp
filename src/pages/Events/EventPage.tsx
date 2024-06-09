@@ -49,7 +49,7 @@ const EventPage: React.FC = () => {
             {event.event_description}
           </Box>
           <Box width="100%" m={8}> {/* Ensure all text boxes stretch to full width */}
-            <Text fontWeight="bold">Date: {event.event_date}</Text>
+            <Text fontWeight="bold">Date: {event.event_start_date} to {event.event_end_date}</Text>
             <Text fontWeight="bold">Time: {event.event_time}</Text>
             <Text fontWeight="bold">Venue: {event.venue}</Text>
           </Box>

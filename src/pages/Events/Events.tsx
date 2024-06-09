@@ -8,11 +8,10 @@ const Events: React.FC = () => {
   const [eventdata, setEventdata] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
-
   useEffect(() => {
     const fetchEvents = async () => {
-      const { data, error } = await supabase.supabase.from('Events').select('*');
-    console.log(data)
+      const { data, error } = await supabase.supabase.from('Events').select('*').filter('event_type', 'eq', 'Upcoming').order('event_start_date', { ascending: true });
+      console.log(data)
       if (error) {
         console.error('Error fetching events:', error);
       } else {
@@ -31,7 +30,11 @@ const Events: React.FC = () => {
 
   return (
     <div className={styles.events}>
-      <EventList eventdata={eventdata} />
+      {eventdata.length !== 0 ? (
+        <EventList eventdata={eventdata} />
+      ) : (
+        <div>No events available</div>
+      )}
     </div>
   );
 };

@@ -23,11 +23,12 @@ const NewEvent: React.FC = () => {
     event_poster: '',
     event_price: '',
     tag_line: '',
-    event_date: '',
+    event_start_date: '',
+    event_end_date: '',
     event_time: '',
     venue: '',
     event_description: '',
-    QR_Code: '', // Added QR_Code field to match your form
+    QR_Code: '',
   });
   const [eventCount, setEventCount] = useState<number>(-1);
 
@@ -49,37 +50,38 @@ const NewEvent: React.FC = () => {
 
     if (error) {
       console.error("Error fetching event count:", error);
-    } else if (count !== null && count>=0) {
+    } else if (count !== null && count >= 0) {
       setEventCount(count);
-        setNewEvent((prevEventData) => ({
-            ...prevEventData,
-            event_id: count + 1
-        }));
+      setNewEvent((prevEventData) => ({
+        ...prevEventData,
+        event_id: count + 1
+      }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      if(newEvent.event_id !== -1 && newEvent.event_name !== '' && newEvent.event_poster !== '' && newEvent.event_description !== '' && newEvent.event_date !== '' && newEvent.event_time !== '' && newEvent.QR_Code !== '') {
-      const { data, error } = await supabase.supabase.from('Events').insert([newEvent]);
-      if (error) {
-        console.error('Error adding event:', error.message);
-      } else if (data) {
-        console.log('Event added successfully:', data);
-        setNewEvent({
-          event_id: -1,
-          event_name: '',
-          event_poster: '',
-          event_price: '',
-          tag_line: '',
-          event_date: '',
-          event_time: '',
-          venue: '',
-          event_description: '',
-          QR_Code: '',
-        });
-      }
+      if (newEvent.event_id !== -1 && newEvent.event_name !== '' && newEvent.event_poster !== '' && newEvent.event_description !== '' && newEvent.event_start_date !== '' && newEvent.event_end_date !== '' && newEvent.event_time !== '' && newEvent.QR_Code !== '') {
+        const { data, error } = await supabase.supabase.from('Events').insert([newEvent]);
+        if (error) {
+          console.error('Error adding event:', error.message);
+        } else if (data) {
+          console.log('Event added successfully:', data);
+          setNewEvent({
+            event_id: -1,
+            event_name: '',
+            event_poster: '',
+            event_price: '',
+            tag_line: '',
+            event_start_date: '',
+            event_end_date: '',
+            event_time: '',
+            venue: '',
+            event_description: '',
+            QR_Code: '',
+          });
+        }
       }
     } catch (error) {
       console.error('Error adding event:', error);
@@ -105,8 +107,8 @@ const NewEvent: React.FC = () => {
       boxShadow="0px 0px 10px rgba(0, 0, 0, 0.1)"
     >
       <Text fontSize="24px" fontWeight="bold">
-					New Event
-				</Text>
+        New Event
+      </Text>
       <form onSubmit={handleSubmit} style={{ width: "100%" }}>
         <FormControl mb={3}>
           <FormLabel htmlFor="event_name">Event Name</FormLabel>
@@ -174,14 +176,29 @@ const NewEvent: React.FC = () => {
 
         <Flex justify="space-between">
           <FormControl mb={3} mr={2} flex="1">
-            <FormLabel htmlFor="event_date">Event Date</FormLabel>
+            <FormLabel htmlFor="event_start_date">Event Start Date</FormLabel>
             <Input
-              id="event_date"
+              id="event_start_date"
               fontSize="14px"
-              name="event_date"
-              value={newEvent.event_date}
+              name="event_start_date"
+              value={newEvent.event_start_date}
               onChange={handleInputChange}
-              placeholder="Enter date"
+              placeholder="Enter start date"
+              borderColor="gray.400"
+              type="date"
+              width={"100%"} // Full width input
+              required
+            />
+          </FormControl>
+          <FormControl mb={3} mr={2} flex="1">
+            <FormLabel htmlFor="event_end_date">Event End Date</FormLabel>
+            <Input
+              id="event_end_date"
+              fontSize="14px"
+              name="event_end_date"
+              value={newEvent.event_end_date}
+              onChange={handleInputChange}
+              placeholder="Enter end date"
               borderColor="gray.400"
               type="date"
               width={"100%"} // Full width input
