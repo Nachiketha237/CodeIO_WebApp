@@ -1,44 +1,75 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Box, Heading, Image, Text, VStack, Button, Flex } from '@chakra-ui/react';
 import Event from '../../Interfaces/EventInterface';
-import styles from './Styles/Eventpage.module.css';
-import { Button } from '@chakra-ui/react';
-import { useNavigate } from 'react-router-dom';
+import themes from '@/utils/themes'; // Adjust the path as per your project structure
 
 const EventPage: React.FC = () => {
   const location = useLocation();
   const { event } = location.state as { event: Event };
   const navigate = useNavigate();
+
+  // Access specific shades from primary color in themes
+  const { primary,secondary} = themes.colors;
+
   const handleClick = () => {
-    navigate(`/events/${event.event_id}/register`, { state: {event} });
+    navigate(`/events/${event.event_id}/register`, { state: { event } });
   };
 
   return (
-    <div className={styles.base}>
-      <div className={styles.container_for_event_headings}>
-        <div className={styles.event_card}>
-          <img className={styles.eventImg} src={event.event_poster} alt="Event Poster" />
-        </div>
-        <div className={styles.event_text_header}>
-          <h2>{event.event_name}</h2>
-          <h3 className={styles.tag}>{event.tag_line}</h3>
-        </div>
-      </div>
+    <Box p={8} backgroundColor={primary['0']} minHeight="100vh" display="flex" flexDirection="column" alignItems="center">
+      <Box width="100%" display="flex" flexDirection={{ base: 'column', md: 'row' }} justifyContent="flex-start" mt={10}>
+        <Box flexShrink={0}>
+          <Image
+            borderRadius="lg"
+            width={{ base: '100%', md: 200 }}
+            height={200}
+            src={event.event_poster}
+            alt="Event Poster"
+            boxShadow="lg"
+          />
+        </Box>
+        <Box ml={{ md: 6 }} mt={{ base: 4, md: 0 }}>
+          <Heading fontSize="3xl">{event.event_name}</Heading>
+          <Text fontSize="1.5rem" mt={2}>{event.tag_line}</Text>
+        </Box>
+      </Box>
 
-      <div className={styles.background_cards}>
-        <div className={styles.card1}>
-          <pre className={styles.longInfo1}>{event.event_description}</pre>
-          <p>
-            <span className="font-semibold">Date:</span> {event.event_date}<br />
-            <span className="font-semibold">Time:</span> {event.event_time}<br />
-            <span className="font-semibold">Venue:</span> {event.venue}<br />
-            <Button mt={4} size="sm" fontSize="13px" disabled onClick={handleClick}>
-                  Register
-              </Button>
-          </p>
-        </div>
-      </div>
-    </div>
+      <Box mt={10} p={6} width="100%" maxWidth="1200px" borderRadius="lg" boxShadow="lg" backgroundColor={primary['500']}>
+        <VStack align="start" spacing={4}>
+          <Box
+            p={4}
+            borderRadius="md"
+            fontSize="1.25rem"
+            fontWeight="bold"
+            overflow="hidden"
+            maxHeight="250px"
+            width="100%" // Ensure the box stretches to full width
+          >
+            {event.event_description}
+          </Box>
+          <Box width="100%" m={8}> {/* Ensure all text boxes stretch to full width */}
+            <Text fontWeight="bold">Date: {event.event_date}</Text>
+            <Text fontWeight="bold">Time: {event.event_time}</Text>
+            <Text fontWeight="bold">Venue: {event.venue}</Text>
+          </Box>
+          <Flex width="100%" justifyContent="center">
+          <Button
+							mt={4}
+							h="50px"
+							w="150px"
+							fontSize="13px"
+							colorScheme="blue"
+							variant="outline"
+							_hover={{ bg: secondary['0'], color: "blue" }}
+							onClick={handleClick}
+						>
+							Register
+						</Button>
+            </Flex>
+        </VStack>
+      </Box>
+    </Box>
   );
 };
 

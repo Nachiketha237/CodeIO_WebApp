@@ -8,6 +8,7 @@ const Events: React.FC = () => {
   const [eventdata, setEventdata] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     const fetchEvents = async () => {
       const { data, error } = await supabase.supabase.from('Events').select('*');

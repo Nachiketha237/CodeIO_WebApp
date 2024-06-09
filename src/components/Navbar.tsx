@@ -18,6 +18,9 @@ export default function Navbar() {
                             <NavLink to="/events" >Events</NavLink>
                         </li>
                         <li className={styles["nav-link"]}>
+                            <NavLink to="/pastactivities" >Past Activities</NavLink>
+                        </li>
+                        <li className={styles["nav-link"]}>
                             <NavLink to="/about" >About</NavLink>
                         </li>
                         {/* <li className={styles["nav-link"]}>

@@ -14,6 +14,7 @@ import Register from '@/pages/Events/Register';
 // import Logout from '@/pages/Auth/Logout';
 // import Forgot from '@/pages/Auth/Forgot';
 import QueryTool from '@/pages/Admin/QueryTool';
+import PastEvents from '@/pages/Events/PastEvents';
 
 const routes = createBrowserRouter(
     createRoutesFromElements([
@@ -33,6 +34,7 @@ const routes = createBrowserRouter(
                 <Route index element={<Home/>} />,
                 <Route path="/events" element={<Events/>} />,
                 <Route path="/events/:id" element={<EventPage/>} />,
+                <Route path="/pastactivities/" element={<PastEvents/>} />,
                 <Route path="/events/:id/register" element={<Register/>} />,
                 <Route path="/about" element={<About />} />,
                 // <Route path="/contact" element={<Contact />} />

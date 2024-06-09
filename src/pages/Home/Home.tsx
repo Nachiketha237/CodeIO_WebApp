@@ -1,104 +1,132 @@
-import  { useState, useEffect } from 'react';
-import styles from './styles/home.module.css';
-import  Event  from '@/Interfaces/EventInterface';
+import React, { useState, useEffect } from 'react';
+import { Box, Heading, Text, VStack, List, ListItem, ListIcon } from '@chakra-ui/react';
+import Event from '@/Interfaces/EventInterface';
 import supabase from '@/config/supabaseClient';
 import Card1 from '@/components/Card1';
 import Loading from '../Loading';
 
-function Home() {
-    const [eventdata, setEventdata] = useState<Event[]>([]);
-    const [loading, setLoading] = useState(true);
+const Home: React.FC = () => {
+  const [eventdata, setEventdata] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchEvents = async () => {
-            const { data, error } = await supabase.supabase.from('Events').select('*');
-            if (error) {
-                console.error('Error fetching events:', error);
-            } else {
-                setEventdata(data);
-            }
-            setLoading(false);
-        };
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const { data, error } = await supabase.supabase.from('Events').select('*');
+      if (error) {
+        console.error('Error fetching events:', error);
+      } else {
+        setEventdata(data || []);
+      }
+      setLoading(false);
+    };
 
-        fetchEvents();
-    }, []);
+    fetchEvents();
+  }, []);
 
-    if (loading) {
-        <Loading isLoading={loading} />;
-    }
+  if (loading) {
+    return <Loading isLoading={loading} />;
+  }
 
-    // Limit the number of cards to display to a maximum of 3
-    const displayedEvents = eventdata.slice(0, 3);
+  // Ensure we have at least 4 events to display
+//   const displayedEvents = [...eventdata.slice(0, 4), ...eventdata.slice(0, 4), ...eventdata.slice(0, 4), ...eventdata.slice(0, 4)];
 
-    return (
-        <main className={styles.container}>
-            <div className={styles.container}>
-                <header className={styles['title-bar']}>
-                    <h1 className={styles.title}>Welcome to &lt;CodeIO/&gt;!</h1>
-                    <h2 className={styles.subtitle}>The premier technical community and club of the Computer Science and Engineering department at B.M.S. College.</h2>
-                </header>
-                <section className={styles.content}>
-                    <div className={styles.description}>
-                        <h2>Our Vision</h2>
-                        <p>
-                            To promote the exploration and development of technical skills, ensuring students can apply these skills in real-world scenarios.
-                        </p>
-                    </div>
-                   
-                    <div className={styles.description}>
-                        <h2>Our Mission</h2>
-                        <p>
-                            To cultivate an environment that promotes excellence in computer science education and engineering knowledge through various activities and projects.
-                        </p>
-                    </div>
-                    
-                    <div className={styles.description}>
-                        <h2>What We Do</h2>
-                        <p>&lt;CodeIO/&gt; focuses on three main verticals:</p>
-                        <h3>Research & Development (R&D)</h3>
-                        <ul>
-                            <li>Facilitating hackathons, workshops, and technology training sessions.</li>
-                            <li>Encouraging innovative project ideas and supporting their development.</li>
-                        </ul>
-                        <h3>Competitive Coding</h3>
-                        <ul>
-                            <li>Organizing hands-on coding sessions.</li>
-                            <li>Preparing students for campus placement tests and technical interviews.</li>
-                        </ul>
-                        <h3>Development Projects</h3>
-                        <ul>
-                            <li>Undertaking web application development.</li>
-                            <li>Contributing to department-level projects like the Institutional Elective Portal and Placement Portal.</li>
-                        </ul>
-                    </div>
-                    <div className={styles.base}>
-                        <h3 className={styles.title1}>Featured Events</h3>
-                        <div className={styles.gridContainer}>
-                            {displayedEvents.map(event => (
-                                <Card1 key={event.event_id} event={event} />
-                            ))}
-                        </div>
-                    </div>
-                   
-                    <div className={styles.description}>
-                        <h2>Objectives</h2>
-                        <ul>
-                            <li>Foster teamwork and individual project management skills among students.</li>
-                            <li>Contribute to open-source projects, develop websites and applications, and provide technical support to campus organizations.</li>
-                            <li>Collaborate on department and college-level projects, enhancing the overall community.</li>
-                        </ul>
-                    </div>
-                    
-                    <div className={styles.description}>
-                        <h2>Join Us!</h2>
-                        <p>
-                            Are you passionate about coding, development, and technology? Join &lt;CodeIO/&gt; and be a part of a vibrant community where you can learn, grow, and contribute. Together, we can make a difference and build a better tech-savvy community.
-                        </p>
-                    </div>
-                </section>
-            </div>
-        </main>
-    );
-}
+  return (
+    <Box p={8} minHeight="100vh" backgroundColor="primary.50" display="flex" flexDirection="column" alignItems="center">
+      <Box maxWidth="900px" width="100%">
+        <Box textAlign="center" mt={10}>
+          <Heading as="h1" fontSize="4xl" mb={4}>
+            Welcome to &lt;CodeIO/&gt;!
+          </Heading>
+          <Text fontSize="xl" color="neutral.700">
+            The premier technical community and club of the Computer Science and Engineering department at B.M.S. College.
+          </Text>
+        </Box>
+
+        <VStack spacing={8} mt={12} alignItems="start">
+          <Box>
+            <Heading as="h2" fontSize="2xl" mb={4}>
+              Our Vision
+            </Heading>
+            <Text fontSize="lg">
+              To promote the exploration and development of technical skills, ensuring students can apply these skills in real-world scenarios.
+            </Text>
+          </Box>
+
+          <Box>
+            <Heading as="h2" fontSize="2xl" mb={4}>
+              Our Mission
+            </Heading>
+            <Text fontSize="lg">
+              To cultivate an environment that promotes excellence in computer science education and engineering knowledge through various activities and projects.
+            </Text>
+          </Box>
+
+          <Box>
+            <Heading as="h2" fontSize="2xl" mb={4}>
+              What We Do
+            </Heading>
+            <Text fontSize="lg">
+              &lt;CodeIO/&gt; focuses on three main verticals:
+            </Text>
+            <Box ml={4}>
+              <Heading as="h3" fontSize="xl" mb={2}>
+                Research & Development (R&D)
+              </Heading>
+              <List spacing={2}>
+                <ListItem>Facilitating hackathons, workshops, and technology training sessions.</ListItem>
+                <ListItem>Encouraging innovative project ideas and supporting their development.</ListItem>
+              </List>
+              <Heading as="h3" fontSize="xl" mt={4} mb={2}>
+                Competitive Coding
+              </Heading>
+              <List spacing={2}>
+                <ListItem>Organizing hands-on coding sessions.</ListItem>
+                <ListItem>Preparing students for campus placement tests and technical interviews.</ListItem>
+              </List>
+              <Heading as="h3" fontSize="xl" mt={4} mb={2}>
+                Development Projects
+              </Heading>
+              <List spacing={2}>
+                <ListItem>Undertaking web application development.</ListItem>
+                <ListItem>Contributing to department-level projects like the Institutional Elective Portal and Placement Portal.</ListItem>
+              </List>
+            </Box>
+          </Box>
+
+          <Box>
+            <Heading as="h2" fontSize="2xl" mb={4}>
+              Featured Events
+            </Heading>
+            <Box className="gridContainer" display="grid" gridTemplateColumns="repeat(4, 1fr)" gap={6}>
+              {eventdata.map(event => (
+                <Card1 key={event.event_id} event={event} />
+              ))}
+            </Box>
+          </Box>
+
+          <Box>
+            <Heading as="h2" fontSize="2xl" mb={4}>
+              Objectives
+            </Heading>
+            <List spacing={2}>
+              <ListItem>Foster teamwork and individual project management skills among students.</ListItem>
+              <ListItem>Contribute to open-source projects, develop websites and applications, and provide technical support to campus organizations.</ListItem>
+              <ListItem>Collaborate on department and college-level projects, enhancing the overall community.</ListItem>
+            </List>
+          </Box>
+
+          <Box>
+            <Heading as="h2" fontSize="2xl" mb={4}>
+              Join Us!
+            </Heading>
+            <Text fontSize="lg">
+              Are you passionate about coding, development, and technology? Join &lt;CodeIO/&gt; and be a part of a vibrant community where you can learn, grow, and contribute. Together, we can make a difference and build a better tech-savvy community.
+            </Text>
+          </Box>
+        </VStack>
+      </Box>
+    </Box>
+  );
+};
 
 export default Home;

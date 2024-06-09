@@ -3,7 +3,7 @@
 }
 
 .title {
-    @apply text-4xl font-bold  mb-8;
+    @apply text-4xl font-bold  mb-8 mt-6;
     /* margin-top: 1.5rem; */
 }
 
