@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './styles/Card.module.css';
+import { Box, Image, Text } from '@chakra-ui/react';
 import { useAuth } from '@/context/authProvider';
 import Event from '@/Interfaces/EventInterface';
 
@@ -19,14 +19,31 @@ const Card: React.FC<CardProps> = ({ event }) => {
   };
 
   return (
-    <div className={styles.card} onClick={handleClick}>
-      <div className={styles.image}>
-        <img src={event.event_poster} alt="event" />
-      </div>
-      <div className={styles['card-title']}>{event.event_name}</div>
-      <div className={styles['card-content']}>{event.tag_line}</div>
-      <div className={styles['card-footer']}>{event.event_date}</div>
-    </div>
+    <Box
+      className="card"
+      w="56"
+      h="64"
+      bg="primary.400"
+      borderRadius="xl"
+      boxShadow="2xl"
+      overflow={"hidden"}
+      p="6"
+      onClick={handleClick}
+      cursor="pointer"
+    >
+      <Box className="image" justifyContent="center" alignItems="center" objectFit="cover" h="28" w="full" mb="3">
+        <Image src={event.event_poster} alt="event" />
+      </Box>
+      <Text className="card-title" fontSize="2xl" fontWeight="bold">
+        {event.event_name}
+      </Text>
+      <Text className="card-content" fontSize="base" color="gray.700" lineHeight="6">
+        {event.tag_line}
+      </Text>
+      <Text className="card-footer">
+        {event.event_start_date} {event.event_end_date !== '' && `to ${event.event_end_date}`}
+      </Text>
+    </Box>
   );
 };
 

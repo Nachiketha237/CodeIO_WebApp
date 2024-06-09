@@ -1,5 +1,5 @@
 .card {
-    @apply w-56 h-60 bg-primary-400 rounded-2xl shadow-2xl p-4;
+    @apply w-56 h-64 bg-primary-400 rounded-2xl shadow-2xl p-4 overflow-hidden;
 }
 
 .card-title {
