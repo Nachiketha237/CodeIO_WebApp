@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Heading, Textarea, Button, Flex, Text, Spinner } from '@chakra-ui/react';
+import { Box, Heading, Textarea, Button, Flex, Text, Spinner, Select } from '@chakra-ui/react';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import supabase from '../../config/supabaseClient';
@@ -10,6 +10,8 @@ const QueryTool: React.FC = () => {
   const [query, setQuery] = useState<string>('');
   const [queryResult, setQueryResult] = useState<any[]>([]);
   const [tables, setTables] = useState<any[]>([]);
+  const [selectedTable, setSelectedTable] = useState<string>('');
+  const [selectedColumns, setSelectedColumns] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { isLoggedIn } = useAuth();
 
@@ -32,6 +34,16 @@ const QueryTool: React.FC = () => {
     fetchTables();
   }, []);
 
+  const fetchColumns = async (tableName: string) => {
+    const table = tables.find(table => table.table_name === tableName);
+    if (table) {
+      setSelectedColumns(table.columns);
+    }
+    else{
+      setSelectedColumns([]);
+    }
+  };
+
   const handleQuery = async (sqlQuery: string) => {
     try {
       const { data, error } = await supabase.supabase.rpc('execute_query', {
@@ -43,6 +55,7 @@ const QueryTool: React.FC = () => {
 
       if (error) {
         console.error('Error executing query:', error.message);
+        setQueryResult([]);
       } else {
         console.log('Query Result:', data[0].result_rows);
         setQueryResult(data[0].result_rows || []);
@@ -89,6 +102,41 @@ const QueryTool: React.FC = () => {
         <Heading as="h2" size="lg" mb={4}>
           Database Query Tool
         </Heading>
+        <Box mt={10}>
+          <Heading as="h3" size="md" mb={5}>Select Table:</Heading>
+          <Select
+            placeholder="Select table"
+            value={selectedTable}
+            onChange={e => {
+              setSelectedTable(e.target.value);
+              fetchColumns(e.target.value);
+            }}
+            mb={4}
+            overflow={"auto"}
+          >
+            {tables.map((table, index) => (
+              <option key={index} value={table.table_name}>{table.table_name}</option>
+            ))}
+          </Select>
+          {selectedColumns.length > 0 && (
+            <>
+              <Heading as="h3" size="md" mb={3}>Columns:</Heading>
+              <div style={{ overflow: 'auto' }}>
+                <table style={{ width: 'auto', maxWidth: '100%', borderCollapse: 'collapse', overflowX: 'auto' }}>
+                  <thead>
+                    <tr>
+                      {selectedColumns.map((column, index) => (
+                        <th key={index} style={{ border: '1px solid black', padding: '8px', whiteSpace: 'nowrap', marginBottom:'5px' }}>{column.column_name}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            </>
+          )}
+        </Box>
+
+        <Heading as="h3" size="md" mb={5}>Query Here:</Heading>
         <Text>Note: use double inverted commas for table names and don't use semicolons at the end.</Text>
         <Textarea
           placeholder="Enter your SQL query here"
@@ -129,24 +177,8 @@ const QueryTool: React.FC = () => {
           </div>
         </Box>
 
-        {/* Display available tables and columns */}
-        <Box mt={10}>
-          <Heading as="h3" size="md" mb={5}>Available Tables and Columns:</Heading>
-          {loading ? (
-            <Spinner size="xl" />
-          ) : (
-            tables.map((table, index) => (
-              <Box key={index} mb={4}>
-                <Text fontWeight="bold">{table.table_name}</Text>
-                <ul>
-                  {table.columns.map((column: any, idx: number) => (
-                    <li key={idx}>{column.column_name} ({column.data_type})</li>
-                  ))}
-                </ul>
-              </Box>
-            ))
-          )}
-        </Box>
+        {/* Select table and display available columns */}
+
       </Box>
     </>
   );
