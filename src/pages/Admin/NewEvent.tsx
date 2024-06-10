@@ -21,7 +21,7 @@ const NewEvent: React.FC = () => {
     event_id: -1,
     event_name: '',
     event_poster: '',
-    event_price: '',
+    event_price: 0,
     tag_line: '',
     event_start_date: '',
     event_end_date: '',
@@ -72,7 +72,7 @@ const NewEvent: React.FC = () => {
             event_id: -1,
             event_name: '',
             event_poster: '',
-            event_price: '',
+            event_price: 0,
             tag_line: '',
             event_start_date: '',
             event_end_date: '',
@@ -254,7 +254,7 @@ const NewEvent: React.FC = () => {
           />
         </FormControl>
 
-        <Button mt={4} size="sm" fontSize="13px" type="submit" colorScheme="blue">
+        <Button mt={4} size="sm" fontSize="13px" type="submit" colorScheme="blue" >
           Submit
         </Button>
       </form>

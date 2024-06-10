@@ -1,6 +1,6 @@
 import { EditIcon, CloseIcon } from "@chakra-ui/icons";
 import { ChangeEvent, useState } from "react";
-import { Box, Flex, Image, Button, IconButton, Input, Text, FormControl, FormLabel, Textarea } from "@chakra-ui/react";
+import { Box, Flex, Image, Button, IconButton, Input, Text, FormControl, Heading, FormLabel, Textarea } from "@chakra-ui/react";
 import { useAuth } from "@/context/authProvider";
 import Event from "@/Interfaces/EventInterface";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -19,6 +19,9 @@ export default function EventEdit() {
 	const [tempeventData, setTempEventData] = useState<Event>(event);
 	const [editOpen, setEditOpen] = useState(false);
 
+	const [emailContent, setEmailContent] = useState<string>('');
+
+
 	const handleChange = (e: ChangeEvent<HTMLInputElement>, inputContent: string) => {
 		const { value } = e.target;
 		setTempEventData((prevTempEventData) => ({
@@ -26,6 +29,7 @@ export default function EventEdit() {
 			[inputContent]: value,
 		}));
 	};
+	
 
 	const handleClick = (clickType: string) => {
 		if (clickType === "edit") {
@@ -96,6 +100,40 @@ export default function EventEdit() {
 
 		}
 	};
+	const handleSendEmail = async () => {
+		try {
+			const formData = new FormData();
+			formData.append('content', emailContent);
+			if (attachment) {
+				formData.append('attachment', attachment);
+			}
+	
+			// Implement email sending logic here using formData
+			console.log('Sending email with content:', emailContent);
+			console.log('Attachment:', attachment);
+	
+			// Placeholder for actual email sending code
+	
+			alert('Email sent successfully!');
+			setEmailContent('');
+			setAttachment(null);
+		} catch (error) {
+			console.error('Error sending email:', error);
+			// Handle error in email sending
+			alert('Failed to send email. Please try again later.');
+		}
+	};
+	
+
+	const [attachment, setAttachment] = useState<File | null>(null);
+
+	const handleAttachmentChange = (e: ChangeEvent<HTMLInputElement>) => {
+		const files = e.target.files;
+		if (files && files.length > 0) {
+			setAttachment(files[0]);
+		}
+	};
+
 
 	const { isLoggedIn } = useAuth();
 
@@ -293,7 +331,7 @@ export default function EventEdit() {
 						margin: "3px auto", // Optional: Center align the card
 					}}
 				>
-					
+
 					<Flex
 						justify="flex-end"
 						align="center"
@@ -311,7 +349,7 @@ export default function EventEdit() {
 							icon={<EditIcon />}
 							aria-label=""
 						/>
-						
+
 					</Flex>
 					<Flex mb={5}>
 						<Image
@@ -329,17 +367,17 @@ export default function EventEdit() {
 								{eventData.tag_line}
 							</Text>
 							<Button
-							mt={4}
-							h="50px"
-							w="150px"
-							fontSize="13px"
-							colorScheme="blue"
-							variant="outline"
-							_hover={{ bg: "blue.500", color: "white" }}
-							onClick={handleQuery}
-						>
-							Export Registrations
-						</Button>
+								mt={4}
+								h="50px"
+								w="150px"
+								fontSize="13px"
+								colorScheme="blue"
+								variant="outline"
+								_hover={{ bg: "blue.500", color: "white" }}
+								onClick={handleQuery}
+							>
+								Export Registrations
+							</Button>
 						</Text>
 
 
@@ -361,7 +399,7 @@ export default function EventEdit() {
 						{eventData.event_description}
 					</Text>
 					<Text fontSize="14px" mb={2} color="#555">
-					Event Date: {eventData.event_start_date} {eventData.event_end_date !== '' && `to ${eventData.event_end_date}`}
+						Event Date: {eventData.event_start_date} {eventData.event_end_date !== '' && `to ${eventData.event_end_date}`}
 					</Text>
 
 					<Text fontSize="14px" mb={2} color="#555">
@@ -371,8 +409,10 @@ export default function EventEdit() {
 						Venue: {eventData.venue}
 					</Text>
 					
+
+
 					<Flex justify="space-between" align="center">
-						
+
 						<Button
 							mt={4}
 							size="sm"
@@ -385,7 +425,34 @@ export default function EventEdit() {
 							Delete Event
 						</Button>
 					</Flex>
-							
+					<Box mt={10}>
+						<Heading as="h2" size="lg" mb={4}>
+							Send  Emails
+						</Heading>
+						<Textarea
+							placeholder="Email content"
+							value={emailContent}
+							onChange={(e) => setEmailContent(e.target.value)}
+							mb={3}
+						/>
+						<FormControl mb={3} width="100%" display="flex" alignItems={"center"}>
+							<FormLabel htmlFor="attachment">Attachment</FormLabel>
+							<Box flex="1">
+							<Input
+								id="attachment"
+								type="file"
+								onChange={(e) => handleAttachmentChange(e)}
+								borderColor="gray.400"
+								width={"30%"}
+								
+							/>
+							</Box>
+						</FormControl>
+						<Button colorScheme="teal" onClick={handleSendEmail}>
+							Send Email
+						</Button>
+					</Box>
+
 				</div>
 
 			)}

@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { Box, Heading } from '@chakra-ui/react';
 import { useAuth } from '../../context/authProvider';
 import { Link, Outlet } from 'react-router-dom';
@@ -8,21 +7,8 @@ import ManageEvents from './ManageEvents';
 
 const Admin: React.FC = () => {
   const { isLoggedIn} = useAuth();
-  const [emailContent, setEmailContent] = useState<string>('');
-
-  const handleSendEmail = async () => {
-    try {
-      // Implement email sending logic here
-      console.log('Sending email with content:', emailContent);
-      // Placeholder for actual email sending code
-      alert('Email sent successfully!');
-      setEmailContent('');
-    } catch (error) {
-      console.error('Error sending email:', error);
-      // Handle error in email sending
-      alert('Failed to send email. Please try again later.');
-    }
-  };
+  
+  
 
 
   if (!isLoggedIn) {
