@@ -30,8 +30,8 @@ const Card1: React.FC<CardProps> = ({ event }) => {
                         </div>
                     </div>
                     <div className={`${styles.face} ${styles.face2}`}>
-                        <pre className={styles.h}>{event.event_name}</pre>
-                        <p className={styles.h}>{event.tag_line}</p>
+                        <pre >{event.event_name}</pre>
+                        <p >{event.tag_line}</p>
                         <Link to={`/events/${event.event_id}`}>Read More</Link>
                     </div>
                 </div>

@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import supabase from '../../config/supabaseClient';
 import Event from '../../Interfaces/EventInterface';
 import { useEffect } from 'react';
+import { errorToast, successToast } from '@/utils/toast';
 
 const NewEvent: React.FC = () => {
   const [newEvent, setNewEvent] = useState<Event>({
@@ -47,6 +48,7 @@ const NewEvent: React.FC = () => {
     const { count, error } = await supabase.supabase
       .from('Events')
       .select('*', { count: 'exact' });
+      console.log(count);
 
     if (error) {
       console.error("Error fetching event count:", error);
@@ -59,34 +61,41 @@ const NewEvent: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      if (newEvent.event_id !== -1 && newEvent.event_name !== '' && newEvent.event_poster !== '' && newEvent.event_description !== '' && newEvent.event_start_date !== '' && newEvent.event_end_date !== '' && newEvent.event_time !== '' && newEvent.QR_Code !== '') {
-        const { data, error } = await supabase.supabase.from('Events').insert([newEvent]);
-        if (error) {
-          console.error('Error adding event:', error.message);
-        } else if (data) {
-          console.log('Event added successfully:', data);
-          setNewEvent({
-            event_id: -1,
-            event_name: '',
-            event_poster: '',
-            event_price: 0,
-            tag_line: '',
-            event_start_date: '',
-            event_end_date: '',
-            event_time: '',
-            venue: '',
-            event_description: '',
-            QR_Code: '',
-          });
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      try {
+        if (newEvent.event_id !== -1 && newEvent.event_name !== '' && newEvent.event_poster !== '' && newEvent.event_description !== '' && newEvent.event_start_date !== '' && newEvent.event_end_date !== '' && newEvent.event_time !== '' && newEvent.QR_Code !== '') {
+          const { data, error } = await supabase.supabase.from('Events').insert([newEvent]);
+          if (error) {
+            console.error('Error adding event:', error.message);
+            errorToast(`${newEvent.event_name}: Error adding event`);
+
+          } else {
+            console.log('Event added successfully:', data);
+            successToast(`${newEvent.event_name}: Error adding event`);
+            setNewEvent({
+              event_id: -1,
+              event_name: '',
+              event_poster: '',
+              event_price: 0,
+              tag_line: '',
+              event_start_date: '',
+              event_end_date: '',
+              event_time: '',
+              venue: '',
+              event_description: '',
+              QR_Code: '',
+            });
+          }
         }
+      } catch (error) {
+        console.error('Error adding event:', error);
+        errorToast(" title: 'Error adding event'");
+      } finally {
+        // Clear the form or perform any cleanup here
       }
-    } catch (error) {
-      console.error('Error adding event:', error);
-    }
-  };
+    };
+    
 
   if (!isLoggedIn) {
     return (

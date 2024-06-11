@@ -10,7 +10,7 @@ const Home: React.FC = () => {
   const [eventdata, setEventdata] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const events =eventdata.slice(0, 4);
+  const events =eventdata.slice(0, 3);
   useEffect(() => {
     const fetchEvents = async () => {
       const { data, error } = await supabase.supabase.from('Events').select('*').filter('event_type', 'eq', 'Upcoming').order('event_start_date', { ascending: true });
@@ -99,7 +99,8 @@ const Home: React.FC = () => {
             <Heading as="h2" fontSize="2xl" mb={4}>
               Featured Events
             </Heading>
-            <Box className="gridContainer" display="grid" gridTemplateColumns="repeat(4, 1fr)" gap={6}>
+  
+            <Box className="gridContainer" display="grid" gridTemplateColumns="repeat(3, 1fr)" gap={6}>
               {events.map(event => (
                 <Card1 key={event.event_id} event={event} />
               ))}

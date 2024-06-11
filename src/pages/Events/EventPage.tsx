@@ -98,7 +98,7 @@ const EventPage: React.FC = () => {
         <Box flex="2" p={4}>
           <Heading as="h2" size="xl" mb={2}>{event.event_name}</Heading>
           <Text fontSize="lg" mb={4} fontStyle="italic" color="gray.500">{event.tag_line}</Text>
-          <Text fontSize="md" whiteSpace="pre-wrap" mb={4}>{event.event_description}</Text>
+          <Text fontSize="md" align = "justify" whiteSpace="pre-wrap" mb={4}>{event.event_description}</Text>
           <Text fontSize="md" mb={2}><strong>Date:</strong> {event.event_start_date}   {event.event_end_date !== '' && `to ${event.event_end_date}`}</Text>
           <Text fontSize="md" mb={2}><strong>Time:</strong> {event.event_time}</Text>
           <Text fontSize="md" mb={4}><strong>Venue:</strong> {event.venue}</Text>

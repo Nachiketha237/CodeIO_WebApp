@@ -23,6 +23,7 @@ import Event from "../../Interfaces/EventInterface";
 import supabase from "@/config/supabaseClient";
 import Registrations from '../../Interfaces/RegisterInterface';
 import { errorToast,successToast } from '@/utils/toast';
+import { TIMEOUT } from 'dns/promises';
 
 export default function Registration() {
     const [showQRCode, setShowQRCode] = useState(false);
@@ -30,6 +31,7 @@ export default function Registration() {
     const navigate = useNavigate();
     const { event } = location.state as { event: Event };
     const [registerCount, setRegisterCount] = useState<number>(-1);
+    const [eventRegisterCount, setEventRegisterCount] = useState<number>(0); 
     const [registerData, setRegisterData] = useState<Registrations>({
         usn: "",
         user_name: "",
@@ -83,6 +85,7 @@ export default function Registration() {
     };
     
     const handleCloseQRCode = async () => {
+        
         if (!(await validate())) {
             const { data, error } = await supabase.supabase
                 .from('Registrations')
@@ -107,10 +110,29 @@ export default function Registration() {
     
 
     useEffect(() => {
-        fetchEventCount();
+        fetchRegisterCount();
+        fetchEventRegisterCount();
     }, []);
 
-    const fetchEventCount = async () => {
+    const fetchEventRegisterCount = async () => {
+        const { count, error } = await supabase.supabase
+            .from('Registrations')
+            .select('*', { count: 'exact' })
+            .filter('event_id', 'eq', event.event_id);
+
+        if (error) {
+            console.error("Error fetching event count:", error);
+        } else if (count !== null && count >= 0) {
+            setEventRegisterCount(count);
+            if (event.event_limit !== undefined && event.event_limit !== null && event.event_limit > 0 && count >= event.event_limit) {
+                errorToast("Event registration limit reached");
+                navigate('/events');
+            }
+        }
+    };
+
+
+    const fetchRegisterCount = async () => {
         const { count, error } = await supabase.supabase
             .from('Registrations')
             .select('*', { count: 'exact' });

@@ -10,6 +10,7 @@ interface Event {
   event_price: number;
   event_description: string;
   QR_Code?: string;
-  Event_Type?: string;
+  event_type?: string;
+  event_limit?: number;
   }
 export default Event;

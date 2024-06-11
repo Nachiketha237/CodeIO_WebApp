@@ -7,6 +7,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import supabase from "@/config/supabaseClient";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { errorToast, successToast } from "@/utils/toast";
 
 
 
@@ -94,9 +95,11 @@ export default function EventEdit() {
 
 		if (error) {
 			console.error("Error updating event data:", error);
+			errorToast("Error updating event data");
 		}
 		else {
 			console.log("Event data updated successfully:", data);
+			successToast("Event data updated successfully");
 
 		}
 	};
@@ -313,6 +316,7 @@ export default function EventEdit() {
 								required
 							/>
 						</FormControl>
+						
 						<Button mt={4} size="sm" fontSize="13px" type="submit" colorScheme="blue" onClick={handleSubmit}>
 							Submit
 						</Button>
