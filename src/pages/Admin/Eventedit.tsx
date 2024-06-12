@@ -20,6 +20,9 @@ export default function EventEdit() {
 	const [tempeventData, setTempEventData] = useState<Event>(event);
 	const [editOpen, setEditOpen] = useState(false);
 
+	const [file, setFile] = useState<File | ''>('');
+	const [fName, setFName] = useState('');
+	const [fileUrl, setFileUrl] = useState<string | ''>('');
 	const [emailContent, setEmailContent] = useState<string>('');
 
 
@@ -29,8 +32,9 @@ export default function EventEdit() {
 			...prevTempEventData,
 			[inputContent]: value,
 		}));
+		console.log(tempeventData);
 	};
-	
+
 
 	const handleClick = (clickType: string) => {
 		if (clickType === "edit") {
@@ -84,25 +88,67 @@ export default function EventEdit() {
 
 
 
-
 	const handleSubmit = async () => {
-		setEventData(tempeventData);
 		setEditOpen(false);
-		const { data, error } = await supabase.supabase
-			.from('Events')
-			.update(eventData)
-			.eq('event_id', event.event_id);
+	
+		if (!file) return;
+		const fileExt = file.name.split('.').pop();
+		const fileName = `${eventData.event_name}.${fileExt}`;
+		const filePath = `Events/Event_posters/${fileName}`;
+	
+		try {
+			// Upload file to storage
+			let { error: uploadError } = await supabase.supabase.storage
+				.from('CodeIO')
+				.upload(filePath, file);
+	
+			if (uploadError) {
+				console.log("Error uploading image:", uploadError);
+				errorToast("Error uploading image");
+				return;
+			}
+	
+			// Retrieve public URL
+			const { data: url } = await supabase.supabase.storage
+				.from('CodeIO')
+				.getPublicUrl(filePath);
+	
+	
+			if (!url) {
+				console.error("Public URL not available");
+				errorToast("Public URL not available");
+				return;
+			}
+	
+			// Update tempeventData with the public URL
+			setTempEventData((prevTempEventData) => ({
+				...prevTempEventData,
+				event_poster: url.publicUrl,
+			}));
+	
+			successToast("Image uploaded successfully");
+			console.log("File URL:", url.publicUrl);
+			const { data, error } = await supabase.supabase
+				.from('Events')
+				.update(eventData)
+				.eq('event_id', event.event_id);
 
-		if (error) {
-			console.error("Error updating event data:", error);
-			errorToast("Error updating event data");
-		}
-		else {
-			console.log("Event data updated successfully:", data);
-			successToast("Event data updated successfully");
+			if (error) {
+				console.error("Error updating event data:", error);
+				errorToast("Error updating event data");
+			}
+			else {
+				console.log("Event data updated successfully:", data);
+				successToast("Event data updated successfully");
 
+			}
+		} catch (error) {
+			console.error('Error handling submit:', error);
+			errorToast("Error handling submit");
 		}
 	};
+	
+
 	const handleSendEmail = async () => {
 		try {
 			const formData = new FormData();
@@ -110,13 +156,13 @@ export default function EventEdit() {
 			if (attachment) {
 				formData.append('attachment', attachment);
 			}
-	
+
 			// Implement email sending logic here using formData
 			console.log('Sending email with content:', emailContent);
 			console.log('Attachment:', attachment);
-	
+
 			// Placeholder for actual email sending code
-	
+
 			alert('Email sent successfully!');
 			setEmailContent('');
 			setAttachment(null);
@@ -126,7 +172,7 @@ export default function EventEdit() {
 			alert('Failed to send email. Please try again later.');
 		}
 	};
-	
+
 
 	const [attachment, setAttachment] = useState<File | null>(null);
 
@@ -228,8 +274,8 @@ export default function EventEdit() {
 						</FormControl>
 
 						<FormControl mb={3}>
-							<FormLabel htmlFor="event_poster">Event Poster Link</FormLabel>
-							<Input
+							<FormLabel htmlFor="event_poster">Event Poster</FormLabel>
+							{/* <Input
 								id="event_poster"
 								fontSize="14px"
 								value={tempeventData.event_poster}
@@ -239,7 +285,29 @@ export default function EventEdit() {
 								type="url"
 								width={"100%"} // Full width input
 								required
+							/> */}
+							<Input
+								id="event_poster"
+								fontSize="14px"
+								value={tempeventData.event_poster}
+								placeholder="Enter poster link"
+								borderColor="gray.400"
+								width={"100%"} // Full width input
+								required
+								type="file"
+								onChange={(e) => {
+									const file = e.target.files ? e.target.files[0] : '';
+									setFile(file);
+									setFName(e.target.files ? e.target.files[0].name : '');
+									console.log(file);
+								}}
 							/>
+							{fName && (
+								<Text mt={2} fontSize="14px" color="green.500">
+									{`${fName}`}
+								</Text>
+							)}
+
 						</FormControl>
 
 						<Flex justify="space-between">
@@ -280,9 +348,9 @@ export default function EventEdit() {
 									fontSize="14px"
 									value={tempeventData.event_time}
 									onChange={(e) => handleChange(e, "event_time")}
-									placeholder="Enter time"
+									placeholder="HH:MM AM/PM to HH:MM AM/PM"
 									borderColor="gray.400"
-									type="time"
+									type="text"
 									width={"60%"} // Full width input
 									required
 								/>
@@ -316,7 +384,7 @@ export default function EventEdit() {
 								required
 							/>
 						</FormControl>
-						
+
 						<Button mt={4} size="sm" fontSize="13px" type="submit" colorScheme="blue" onClick={handleSubmit}>
 							Submit
 						</Button>
@@ -412,7 +480,7 @@ export default function EventEdit() {
 					<Text fontSize="14px" mb={2} color="#555">
 						Venue: {eventData.venue}
 					</Text>
-					
+
 
 
 					<Flex justify="space-between" align="center">
@@ -442,14 +510,14 @@ export default function EventEdit() {
 						<FormControl mb={3} width="100%" display="flex" alignItems={"center"}>
 							<FormLabel htmlFor="attachment">Attachment</FormLabel>
 							<Box flex="1">
-							<Input
-								id="attachment"
-								type="file"
-								onChange={(e) => handleAttachmentChange(e)}
-								borderColor="gray.400"
-								width={"30%"}
-								
-							/>
+								<Input
+									id="attachment"
+									type="file"
+									onChange={(e) => handleAttachmentChange(e)}
+									borderColor="gray.400"
+									width={"30%"}
+
+								/>
 							</Box>
 						</FormControl>
 						<Button colorScheme="teal" onClick={handleSendEmail}>

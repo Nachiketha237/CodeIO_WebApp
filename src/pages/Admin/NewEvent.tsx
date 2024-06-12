@@ -1,20 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   FormControl,
   FormLabel,
   Input,
-  Text,
   Textarea,
   Button,
   Flex,
+  Text,
   Link as ChakraLink,
 } from '@chakra-ui/react';
-import { useAuth } from '../../context/authProvider';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/authProvider';
 import supabase from '../../config/supabaseClient';
 import Event from '../../Interfaces/EventInterface';
-import { useEffect } from 'react';
 import { errorToast, successToast } from '@/utils/toast';
 
 const NewEvent: React.FC = () => {
@@ -30,6 +29,7 @@ const NewEvent: React.FC = () => {
     venue: '',
     event_description: '',
     QR_Code: '',
+    event_type: 'Upcoming',
   });
   const [eventCount, setEventCount] = useState<number>(-1);
 
@@ -48,7 +48,6 @@ const NewEvent: React.FC = () => {
     const { count, error } = await supabase.supabase
       .from('Events')
       .select('*', { count: 'exact' });
-      console.log(count);
 
     if (error) {
       console.error("Error fetching event count:", error);
@@ -61,41 +60,52 @@ const NewEvent: React.FC = () => {
     }
   };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      try {
-        if (newEvent.event_id !== -1 && newEvent.event_name !== '' && newEvent.event_poster !== '' && newEvent.event_description !== '' && newEvent.event_start_date !== '' && newEvent.event_end_date !== '' && newEvent.event_time !== '' && newEvent.QR_Code !== '') {
-          const { data, error } = await supabase.supabase.from('Events').insert([newEvent]);
-          if (error) {
-            console.error('Error adding event:', error.message);
-            errorToast(`${newEvent.event_name}: Error adding event`);
-
-          } else {
-            console.log('Event added successfully:', data);
-            successToast(`${newEvent.event_name}: Error adding event`);
-            setNewEvent({
-              event_id: -1,
-              event_name: '',
-              event_poster: '',
-              event_price: 0,
-              tag_line: '',
-              event_start_date: '',
-              event_end_date: '',
-              event_time: '',
-              venue: '',
-              event_description: '',
-              QR_Code: '',
-            });
-          }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      if (
+        newEvent.event_id !== -1 &&
+        newEvent.event_name !== '' &&
+        newEvent.event_description !== '' &&
+        newEvent.event_time !== '' &&
+        newEvent.QR_Code !== '' &&
+        newEvent.venue !== '' &&
+        newEvent.event_start_date <= newEvent.event_end_date
+      ) {
+        if (newEvent.event_start_date < new Date().toISOString().split('T')[0]) {
+          newEvent.event_type = 'Upcoming';
         }
-      } catch (error) {
-        console.error('Error adding event:', error);
-        errorToast(" title: 'Error adding event'");
-      } finally {
-        // Clear the form or perform any cleanup here
+
+        const { data, error } = await supabase.supabase.from('Events').insert([newEvent]);
+        if (error) {
+          console.error('Error adding event:', error.message);
+          errorToast(`${newEvent.event_name}: Error adding event`);
+        } else {
+          console.log('Event added successfully:', data);
+          successToast(`${newEvent.event_name}: Event added successfully`);
+          setNewEvent({
+            event_id: -1,
+            event_name: '',
+            event_poster: '',
+            event_price: 0,
+            tag_line: '',
+            event_start_date: '',
+            event_end_date: '',
+            event_time: '',
+            venue: '',
+            event_description: '',
+            QR_Code: '',
+            event_type: 'Upcoming',
+          });
+        }
       }
-    };
-    
+    } catch (error) {
+      console.error('Error adding event:', error);
+      errorToast("Error adding event");
+    } finally {
+      // Clear the form or perform any cleanup here
+    }
+  };
 
   if (!isLoggedIn) {
     return (
@@ -130,7 +140,7 @@ const NewEvent: React.FC = () => {
             placeholder="Enter title"
             borderColor="gray.400"
             type="text"
-            width={"100%"} // Full width input
+            width={"40%"} // Full width input
             autoFocus
             required
           />
@@ -147,7 +157,7 @@ const NewEvent: React.FC = () => {
             placeholder="Enter tagline"
             borderColor="gray.400"
             type="text"
-            width={"100%"} // Full width input
+            width={"60%"} // Full width input
           />
         </FormControl>
 
@@ -223,9 +233,9 @@ const NewEvent: React.FC = () => {
               name="event_time"
               value={newEvent.event_time}
               onChange={handleInputChange}
-              placeholder="Enter time"
+              placeholder="HH:MM AM/PM to HH:MM AM/PM"
               borderColor="gray.400"
-              type="time"
+              type="text"
               width={"100%"} // Full width input
               required
             />

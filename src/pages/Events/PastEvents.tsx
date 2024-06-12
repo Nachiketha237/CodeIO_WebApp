@@ -12,10 +12,14 @@ import supabase from '../../config/supabaseClient';
 import { useEffect, useState } from 'react';
 import Event from '../../Interfaces/EventInterface';
 import Loading from '../Loading';
+import YearSelector from '../../components/YearSelector';
+
+
 
 const PastEvents: React.FC = () => {
   const [eventdata, setEventdata] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -32,6 +36,14 @@ const PastEvents: React.FC = () => {
     
     fetchEvents();
   }, []);
+  const handleYearChange = (year: number) => {
+    setSelectedYear(year);
+  };
+
+  const filteredEvents = selectedYear
+    ? eventdata.filter(event => new Date(event.event_start_date).getFullYear() === selectedYear)
+    : eventdata;
+
   if(loading)
     {
       return <Loading isLoading/>
@@ -42,8 +54,10 @@ const PastEvents: React.FC = () => {
         <Heading as="h2" size="xl" mb={8}>
           Past Activities
         </Heading>
+        
         <VStack spacing={8}>
-          {eventdata.map((event) => (
+        <YearSelector onSelectYear={handleYearChange} eventdata={eventdata}/>
+          {filteredEvents.map((event) => (
             <Box key={event.event_id} p={8} bg={primary['500']} boxShadow="md" borderRadius="lg">
               <VStack spacing={4} align="start">
                 {/* <Image src={event.event_poster} alt={`${event.event_name} Poster`} borderRadius="md" /> */}
@@ -75,5 +89,7 @@ const PastEvents: React.FC = () => {
     </Box>
   );
 };
+
+
 
 export default PastEvents;
