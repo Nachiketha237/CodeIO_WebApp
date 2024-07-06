@@ -39,6 +39,9 @@ export default function AdminNavbar() {
                     <li className={styles["nav-link"]}>
                         <NavLink to="/admin/query">Query Tool</NavLink>
                     </li>
+                    {/* <li className={styles["nav-link"]}>
+                        <NavLink to="/admin/content-manager">Content Management</NavLink>
+                    </li> */}
                     {isLoggedIn && (
                         <li className={styles["nav-link"]} onClick={handleLogout}>
                                 Logout

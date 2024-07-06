@@ -47,7 +47,10 @@ const NewEvent: React.FC = () => {
   const fetchEventCount = async () => {
     const { count, error } = await supabase.supabase
       .from('Events')
-      .select('*', { count: 'exact' });
+      .select('event_id')
+      .order('event_id', { ascending: false })
+      .limit(1);
+
 
     if (error) {
       console.error("Error fetching event count:", error);

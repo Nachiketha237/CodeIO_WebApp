@@ -90,42 +90,42 @@ export default function EventEdit() {
 
 	const handleSubmit = async () => {
 		setEditOpen(false);
-	
+
 		if (!file) return;
 		const fileExt = file.name.split('.').pop();
 		const fileName = `${eventData.event_name}.${fileExt}`;
 		const filePath = `Events/Event_posters/${fileName}`;
-	
+
 		try {
 			// Upload file to storage
 			let { error: uploadError } = await supabase.supabase.storage
 				.from('CodeIO')
 				.upload(filePath, file);
-	
+
 			if (uploadError) {
 				console.log("Error uploading image:", uploadError);
 				errorToast("Error uploading image");
 				return;
 			}
-	
+
 			// Retrieve public URL
 			const { data: url } = await supabase.supabase.storage
 				.from('CodeIO')
 				.getPublicUrl(filePath);
-	
-	
+
+
 			if (!url) {
 				console.error("Public URL not available");
 				errorToast("Public URL not available");
 				return;
 			}
-	
+
 			// Update tempeventData with the public URL
 			setTempEventData((prevTempEventData) => ({
 				...prevTempEventData,
 				event_poster: url.publicUrl,
 			}));
-	
+
 			successToast("Image uploaded successfully");
 			console.log("File URL:", url.publicUrl);
 			const { data, error } = await supabase.supabase
@@ -147,7 +147,7 @@ export default function EventEdit() {
 			errorToast("Error handling submit");
 		}
 	};
-	
+
 
 	const handleSendEmail = async () => {
 		try {
@@ -274,25 +274,30 @@ export default function EventEdit() {
 						</FormControl>
 
 						<FormControl mb={3}>
-							<FormLabel htmlFor="event_poster">Event Poster</FormLabel>
-							{/* <Input
-								id="event_poster"
-								fontSize="14px"
-								value={tempeventData.event_poster}
-								onChange={(e) => handleChange(e, "event_poster")}
-								placeholder="Enter poster link"
-								borderColor="gray.400"
-								type="url"
-								width={"100%"} // Full width input
-								required
-							/> */}
+							<FormLabel htmlFor="event_poster">
+								{tempeventData.event_poster ? (
+									<Image
+										src={tempeventData.event_poster}
+										alt={tempeventData.event_name}
+										width="140px"
+										height="140px"
+										objectFit="cover"
+										borderRadius="3px"
+										boxShadow="5px 5px 8px rgba(0, 0, 0, 0.4)"
+										mr={4}
+									/>
+								) : (
+									<Text fontSize="14px" color="red.500">
+										Upload Poster
+									</Text>
+								)}
+							</FormLabel>
 							<Input
 								id="event_poster"
 								fontSize="14px"
-								value={tempeventData.event_poster}
 								placeholder="Enter poster link"
 								borderColor="gray.400"
-								width={"100%"} // Full width input
+								width="100%" // Full width input
 								required
 								type="file"
 								onChange={(e) => {
@@ -302,6 +307,7 @@ export default function EventEdit() {
 									console.log(file);
 								}}
 							/>
+
 							{fName && (
 								<Text mt={2} fontSize="14px" color="green.500">
 									{`${fName}`}
