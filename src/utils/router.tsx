@@ -15,6 +15,7 @@ import Register from '@/pages/Events/Register';
 // import Forgot from '@/pages/Auth/Forgot';
 import QueryTool from '@/pages/Admin/QueryTool';
 import PastEvents from '@/pages/Events/PastEvents';
+import ContentManager from '@/pages/Admin/ContentManager';
 
 const routes = createBrowserRouter(
     createRoutesFromElements([
@@ -25,6 +26,7 @@ const routes = createBrowserRouter(
                 <Route path="/admin/events/new" element={<NewEvent/>} />,
                 <Route path="/admin/events/:id" element={<EventEdit/>} />,
                 <Route path="/admin/query" element={<QueryTool/>} />,
+                // <Route path="/admin/content-manager" element={<ContentManager/>} />,
                 // <Route path="/login" element={<Logout/>} />,
                 // <Route path="/forgot_password" element={<Forgot/>} />,
             ]}
