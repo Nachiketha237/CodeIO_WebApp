@@ -92,6 +92,7 @@ export default function Registration() {
 
     const sendEmail = async() => {
         const obj : any = {
+            name: registerData.user_name,
             email: registerData.email, 
             workshopName : event.event_name, 
             date: event.event_start_date, 
@@ -267,10 +268,12 @@ export default function Registration() {
                                         Payment Confirmed
                                     </Heading>
                                     <Box>
-                                        <p><strong>Workshop Name:</strong> Example Workshop</p>
-                                        <p><strong>Date:</strong> 25th June 2024</p>
-                                        {/* <p><strong>Participant Name:</strong> {formData.name}</p>
-                                        <p><strong>Email:</strong> {formData.email}</p> */}
+                                        <p><strong>Registration ID:</strong> {registerData.registration_id}</p>
+                                        <p><strong>Workshop Name:</strong>{event.event_name}</p>
+                                        <p><strong>Date:</strong> {event.event_start_date}</p>
+                                        <p><strong>Time:</strong> {event.event_time}</p>
+                                        <p><strong>Venue:</strong> {event.venue}</p>
+
                                     </Box>
                                 </Box>
                             </ModalBody>
