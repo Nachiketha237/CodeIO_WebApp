@@ -8,6 +8,7 @@ import supabase from "@/config/supabaseClient";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { errorToast, successToast } from "@/utils/toast";
+import axiosInstance from "@/axiosInstance";
 
 
 
@@ -24,6 +25,14 @@ export default function EventEdit() {
 	const [fName, setFName] = useState('');
 	const [fileUrl, setFileUrl] = useState<string | ''>('');
 	const [emailContent, setEmailContent] = useState<string>('');
+	const [attachment, setAttachment] = useState<File | null>(null);
+
+	// const handleAttachmentChange = (e: ChangeEvent<HTMLInputElement>) => {
+	// 	const files = e.target.files;
+	// 	if (files && files.length > 0) {
+	// 		setAttachment(files[0]);
+	// 	}
+	// };
 
 
 	const handleChange = (e: ChangeEvent<HTMLInputElement>, inputContent: string) => {
@@ -43,6 +52,7 @@ export default function EventEdit() {
 			setEditOpen(false);
 		}
 	};
+
 	const handleDelete = async () => {
 		const { data, error } = await supabase.supabase
 			.from('Events') // Replace 'events' with your table name
@@ -148,40 +158,64 @@ export default function EventEdit() {
 		}
 	};
 
+	const sendEmail = async (emailContent: string,  users: any[]) => {
+		const obj: any = {
+			content: emailContent,
+			attachment,
+			recipients: users // Assuming you want to send email to all users
+		};
+
+		const response = await axiosInstance.post('/adminMail', obj);
+
+		if(response.status === 200)
+		{
+			successToast("Email sent successfully");
+		}
+		else
+		{
+			errorToast("Failed to send email");
+			console.error('Error sending email:', response);
+		}
+		setEmailContent('');
+		setAttachment(null);
+
+	};
 
 	const handleSendEmail = async () => {
 		try {
-			const formData = new FormData();
-			formData.append('content', emailContent);
-			if (attachment) {
-				formData.append('attachment', attachment);
+			// const formData = new FormData();
+			// formData.append('content', emailContent);
+			// if (attachment) {
+			// 	formData.append('attachment', attachment);
+			// }
+
+			const { data: users, error } = await supabase.supabase
+				.from('Registrations')
+				.select('email, user_name')
+				.eq('event_id', event.event_id);
+
+			if (error) {
+				console.error('Error fetching users:', error);
+			} else {
+				console.log('Users:', users);
+				// Implement email sending logic here using formData
+				console.log('Sending email with content:', emailContent);
+				console.log('Attachment:', attachment);
+				await sendEmail(emailContent, users);	
+
 			}
 
-			// Implement email sending logic here using formData
-			console.log('Sending email with content:', emailContent);
-			console.log('Attachment:', attachment);
-
-			// Placeholder for actual email sending code
-
-			alert('Email sent successfully!');
-			setEmailContent('');
-			setAttachment(null);
+	
+			
 		} catch (error) {
 			console.error('Error sending email:', error);
 			// Handle error in email sending
-			alert('Failed to send email. Please try again later.');
+			errorToast('Failed to send email. Please try again later.');
 		}
 	};
 
 
-	const [attachment, setAttachment] = useState<File | null>(null);
 
-	const handleAttachmentChange = (e: ChangeEvent<HTMLInputElement>) => {
-		const files = e.target.files;
-		if (files && files.length > 0) {
-			setAttachment(files[0]);
-		}
-	};
 
 
 	const { isLoggedIn } = useAuth();
@@ -513,7 +547,7 @@ export default function EventEdit() {
 							onChange={(e) => setEmailContent(e.target.value)}
 							mb={3}
 						/>
-						<FormControl mb={3} width="100%" display="flex" alignItems={"center"}>
+						{/* <FormControl mb={3} width="100%" display="flex" alignItems={"center"}>
 							<FormLabel htmlFor="attachment">Attachment</FormLabel>
 							<Box flex="1">
 								<Input
@@ -525,7 +559,7 @@ export default function EventEdit() {
 
 								/>
 							</Box>
-						</FormControl>
+						</FormControl> */}
 						<Button colorScheme="teal" onClick={handleSendEmail}>
 							Send Email
 						</Button>
