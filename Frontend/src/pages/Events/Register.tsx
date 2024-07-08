@@ -24,6 +24,7 @@ import supabase from "@/config/supabaseClient";
 import Registrations from '../../Interfaces/RegisterInterface';
 import { errorToast,successToast } from '@/utils/toast';
 import { TIMEOUT } from 'dns/promises';
+import axiosInstance from '../../axiosInstance';
 
 export default function Registration() {
     const [showQRCode, setShowQRCode] = useState(false);
@@ -32,16 +33,21 @@ export default function Registration() {
     const { event } = location.state as { event: Event };
     const [registerCount, setRegisterCount] = useState<number>(-1);
     const [eventRegisterCount, setEventRegisterCount] = useState<number>(0); 
+    const [showConfirmation, setShowConfirmation] = useState(false);
     const [registerData, setRegisterData] = useState<Registrations>({
         usn: "",
         user_name: "",
         email: "",
         phone: "",
-        department: "CSE", // default department
-        year: "1", // default year
+        department: " ", // default department
+        year: " ", // default year
         event_id: event.event_id,
         payment_status: true, // initial payment status
     });
+
+    useEffect(() => {
+        console.log(event)
+    },[])
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>, inputContent: string) => {
         const { value } = e.target;
@@ -83,9 +89,21 @@ export default function Registration() {
             return false;
         }
     };
-    
+
+    const sendEmail = async() => {
+        const obj : any = {
+            name: registerData.user_name,
+            email: registerData.email, 
+            workshopName : event.event_name, 
+            date: event.event_start_date, 
+            time: event.event_time, 
+            venue: event.venue
+        }
+        const response = await axiosInstance.post('/mail', obj)
+        console.log(response.status == 200 ? `Mail Sent` : `Mail Failed`)
+    }
+
     const handleCloseQRCode = async () => {
-        
         if (!(await validate())) {
             const { data, error } = await supabase.supabase
                 .from('Registrations')
@@ -97,16 +115,24 @@ export default function Registration() {
             } else {
                 console.log('Registration data inserted successfully:', data);
                 // Update state or perform any necessary action
-                successToast("Registration successfull")
-                navigate('/events');
+               successToast("Registration successfull");
+               if(registerData.email){
+               sendEmail();
+               }// navigate('/events');
             }
         } else {
             errorToast("Registration already exists for this event.");
         }
     
         setShowQRCode(false);
+        setShowConfirmation(true);
        
     };
+
+    const handleCloseConfirmation = () => {
+       navigate('/events');
+        setShowConfirmation(false);
+    }
     
 
     useEffect(() => {
@@ -228,6 +254,40 @@ export default function Registration() {
                     </ModalContent>
                 </Modal>
                 </FormControl>
+
+
+                <FormControl mt={4}>
+                    <Modal isOpen={showConfirmation} onClose={handleCloseConfirmation}>
+                        <ModalOverlay />
+                        <ModalContent>
+                            <ModalHeader>Payment Confirmation</ModalHeader>
+                            <ModalCloseButton />
+                            <ModalBody>
+                                <Box>
+                                    <Heading as="h2" size="md" textAlign="center" color="green.500" mb={4}>
+                                        Payment Confirmed
+                                    </Heading>
+                                    <Box>
+                                        <p><strong>Registration ID:</strong> {registerData.registration_id}</p>
+                                        <p><strong>Workshop Name:</strong>{event.event_name}</p>
+                                        <p><strong>Date:</strong> {event.event_start_date}</p>
+                                        <p><strong>Time:</strong> {event.event_time}</p>
+                                        <p><strong>Venue:</strong> {event.venue}</p>
+
+                                    </Box>
+                                </Box>
+                            </ModalBody>
+                            <Center mt={4}>
+                                <ModalFooter>
+                                    <Button colorScheme="teal" onClick={handleCloseConfirmation}>
+                                        Close
+                                    </Button>
+                                </ModalFooter>
+                            </Center>
+                        </ModalContent>
+                    </Modal>
+                </FormControl>
+
             </Box>
         </Flex>
     );
