@@ -10,13 +10,14 @@ import {
   Text,
   Link as ChakraLink,
 } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authProvider';
 import supabase from '../../config/supabaseClient';
 import Event from '../../Interfaces/EventInterface';
 import { errorToast, successToast } from '@/utils/toast';
 
 const NewEvent: React.FC = () => {
+  const navigate = useNavigate();
   const [newEvent, setNewEvent] = useState<Event>({
     event_id: -1,
     event_name: '',
@@ -45,13 +46,15 @@ const NewEvent: React.FC = () => {
   }, []);
 
   const fetchEventCount = async () => {
-    const { count, error } = await supabase.supabase
+    const { data, error } = await supabase.supabase
       .from('Events')
       .select('event_id')
       .order('event_id', { ascending: false })
       .limit(1);
 
-
+    console.log('Event count:', data);
+    const count = data ? data[0].event_id : -1;
+    console.log('Event count:', count);
     if (error) {
       console.error("Error fetching event count:", error);
     } else if (count !== null && count >= 0) {
@@ -65,6 +68,7 @@ const NewEvent: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('New Event:', newEvent);
     try {
       if (
         newEvent.event_id !== -1 &&
@@ -77,6 +81,9 @@ const NewEvent: React.FC = () => {
       ) {
         if (newEvent.event_start_date < new Date().toISOString().split('T')[0]) {
           newEvent.event_type = 'Upcoming';
+        }
+        else{
+          newEvent.event_type = 'Past';
         }
 
         const { data, error } = await supabase.supabase.from('Events').insert([newEvent]);
@@ -100,6 +107,7 @@ const NewEvent: React.FC = () => {
             QR_Code: '',
             event_type: 'Upcoming',
           });
+          navigate('/admin')
         }
       }
     } catch (error) {
@@ -192,7 +200,6 @@ const NewEvent: React.FC = () => {
             borderColor="gray.400"
             type="url"
             width={"100%"} // Full width input
-            required
           />
         </FormControl>
 
