@@ -88,6 +88,7 @@ export default function EventEdit() {
 				const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 				saveAs(blob, 'query_result.xlsx');
 			} else {
+				errorToast('No registrations found for event_id:');
 				console.log('No data found for event_id:', event.event_id);
 			}
 		} catch (error) {
@@ -103,14 +104,41 @@ export default function EventEdit() {
 
 		if (!file) return;
 		const fileExt = file.name.split('.').pop();
-		const fileName = `${eventData.event_name}.${fileExt}`;
+		const fileName = `${eventData.event_id}.${fileExt}`;
 		const filePath = `Events/Event_posters/${fileName}`;
 
 		try {
 			// Upload file to storage
+			// const { data: existingFile, error: getError } = await supabase.supabase.storage
+			//     .from('CodeIO')
+			//     .list(`Events/Event_posters/${fileName}`);
+			// console.log("Existing file:", existingFile);
+			// console.log("Error:", getError);
+
+			// if (getError!==null) {
+			//     console.log("Error checking existing file:", getError);
+			// } else if (existingFile){
+			//     // Delete the existing file
+			// 	console.log("Deleting existing file:", existingFile);
+
+			//     const { error: deleteError } = await supabase.supabase.storage
+			//         .from('CodeIO')
+			//         .remove([filePath]);
+
+			//     if (deleteError) {
+			//         console.log("Error deleting existing file:", deleteError);
+			//     }
+			// 	else {
+			// 		console.log("Existing file deleted successfully");
+			// 	}
+			// }
+
 			let { error: uploadError } = await supabase.supabase.storage
 				.from('CodeIO')
-				.upload(filePath, file);
+				.upload(filePath, file,
+					{
+						upsert: true
+					  });
 
 			if (uploadError) {
 				console.log("Error uploading image:", uploadError);
@@ -122,7 +150,7 @@ export default function EventEdit() {
 			const { data: url } = await supabase.supabase.storage
 				.from('CodeIO')
 				.getPublicUrl(filePath);
-
+			console.log("Public URL:", url.publicUrl);
 
 			if (!url) {
 				console.error("Public URL not available");
@@ -131,16 +159,15 @@ export default function EventEdit() {
 			}
 
 			// Update tempeventData with the public URL
-			setTempEventData((prevTempEventData) => ({
-				...prevTempEventData,
-				event_poster: url.publicUrl,
-			}));
+
+			const tempObj: Event = tempeventData
+			tempObj.event_poster = url.publicUrl
 
 			successToast("Image uploaded successfully");
-			console.log("File URL:", url.publicUrl);
+			console.log("File URL:", tempeventData.event_poster);
 			const { data, error } = await supabase.supabase
 				.from('Events')
-				.update(eventData)
+				.update(tempObj)
 				.eq('event_id', event.event_id);
 
 			if (error) {
@@ -151,14 +178,16 @@ export default function EventEdit() {
 				console.log("Event data updated successfully:", data);
 				successToast("Event data updated successfully");
 
+
 			}
+			navigate('/admin');
 		} catch (error) {
 			console.error('Error handling submit:', error);
 			errorToast("Error handling submit");
 		}
 	};
 
-	const sendEmail = async (emailContent: string,  users: any[]) => {
+	const sendEmail = async (emailContent: string, users: any[]) => {
 		const obj: any = {
 			content: emailContent,
 			attachment,
@@ -167,12 +196,10 @@ export default function EventEdit() {
 
 		const response = await axiosInstance.post('/adminMail', obj);
 
-		if(response.status === 200)
-		{
+		if (response.status === 200) {
 			successToast("Email sent successfully");
 		}
-		else
-		{
+		else {
 			errorToast("Failed to send email");
 			console.error('Error sending email:', response);
 		}
@@ -201,12 +228,12 @@ export default function EventEdit() {
 				// Implement email sending logic here using formData
 				console.log('Sending email with content:', emailContent);
 				console.log('Attachment:', attachment);
-				await sendEmail(emailContent, users);	
+				await sendEmail(emailContent, users);
 
 			}
 
-	
-			
+
+
 		} catch (error) {
 			console.error('Error sending email:', error);
 			// Handle error in email sending
@@ -332,7 +359,6 @@ export default function EventEdit() {
 								placeholder="Enter poster link"
 								borderColor="gray.400"
 								width="100%" // Full width input
-								required
 								type="file"
 								onChange={(e) => {
 									const file = e.target.files ? e.target.files[0] : '';
@@ -425,7 +451,7 @@ export default function EventEdit() {
 							/>
 						</FormControl>
 
-						<Button mt={4} size="sm" fontSize="13px" type="submit" colorScheme="blue" onClick={handleSubmit}>
+						<Button mt={4} size="sm" fontSize="13px" type="submit" colorScheme="blue" >
 							Submit
 						</Button>
 					</form>
