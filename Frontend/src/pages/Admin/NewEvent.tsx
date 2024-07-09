@@ -9,6 +9,7 @@ import {
   Flex,
   Text,
   Link as ChakraLink,
+  Image
 } from '@chakra-ui/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authProvider';
@@ -33,7 +34,8 @@ const NewEvent: React.FC = () => {
     event_type: 'Upcoming',
   });
   const [eventCount, setEventCount] = useState<number>(-1);
-
+  const [file, setFile] = useState<File | ''>('');
+  const [fName, setFName] = useState('');
   const { isLoggedIn } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -70,6 +72,7 @@ const NewEvent: React.FC = () => {
     e.preventDefault();
     console.log('New Event:', newEvent);
     try {
+
       if (
         newEvent.event_id !== -1 &&
         newEvent.event_name !== '' &&
@@ -82,11 +85,49 @@ const NewEvent: React.FC = () => {
         if (newEvent.event_start_date < new Date().toISOString().split('T')[0]) {
           newEvent.event_type = 'Upcoming';
         }
-        else{
+        else {
           newEvent.event_type = 'Past';
         }
+        if (!file) return;
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${newEvent.event_id}.${fileExt}`;
+        const filePath = `Events/Event_posters/${fileName}`;
 
-        const { data, error } = await supabase.supabase.from('Events').insert([newEvent]);
+
+        let { error: uploadError } = await supabase.supabase.storage
+          .from('CodeIO')
+          .upload(filePath, file,
+            {
+              upsert: true
+            });
+
+        if (uploadError) {
+          console.log("Error uploading image:", uploadError);
+          errorToast("Error uploading image");
+          return;
+        }
+
+        // Retrieve public URL
+        const { data: url } = await supabase.supabase.storage
+          .from('CodeIO')
+          .getPublicUrl(filePath);
+        console.log("Public URL:", url.publicUrl);
+
+        if (!url) {
+          console.error("Public URL not available");
+          errorToast("Public URL not available");
+          return;
+        }
+
+        // Update tempeventData with the public URL
+
+        const tempObj: Event = { ...newEvent };
+        tempObj.event_poster = url.publicUrl
+
+        successToast("Image uploaded successfully");
+
+
+        const { data, error } = await supabase.supabase.from('Events').insert(tempObj);
         if (error) {
           console.error('Error adding event:', error.message);
           errorToast(`${newEvent.event_name}: Error adding event`);
@@ -189,20 +230,46 @@ const NewEvent: React.FC = () => {
         </FormControl>
 
         <FormControl mb={3}>
-          <FormLabel htmlFor="event_poster">Event Poster Link</FormLabel>
+          <FormLabel htmlFor="event_poster">
+            {newEvent.event_poster ? (
+              <Image
+                src={newEvent.event_poster}
+                alt={newEvent.event_name}
+                width="140px"
+                height="140px"
+                objectFit="cover"
+                borderRadius="3px"
+                boxShadow="5px 5px 8px rgba(0, 0, 0, 0.4)"
+                mr={4}
+              />
+            ) : (
+              <Text fontSize="14px" color="red.500">
+                Upload Poster
+              </Text>
+            )}
+          </FormLabel>
           <Input
             id="event_poster"
             fontSize="14px"
-            name="event_poster"
-            value={newEvent.event_poster}
-            onChange={handleInputChange}
             placeholder="Enter poster link"
             borderColor="gray.400"
-            type="url"
-            width={"100%"} // Full width input
+            width="100%" // Full width input
+            type="file"
+            onChange={(e) => {
+              const file = e.target.files ? e.target.files[0] : '';
+              setFile(file);
+              setFName(e.target.files ? e.target.files[0].name : '');
+              console.log(file);
+            }}
           />
-        </FormControl>
 
+          {fName && (
+            <Text mt={2} fontSize="14px" color="green.500">
+              {`${fName}`}
+            </Text>
+          )}
+
+        </FormControl>
         <Flex justify="space-between">
           <FormControl mb={3} mr={2} flex="1">
             <FormLabel htmlFor="event_start_date">Event Start Date</FormLabel>
